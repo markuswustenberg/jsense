@@ -1,0 +1,17 @@
+allprojects {
+    apply plugin: 'idea'
+}
+
+subprojects {
+    apply plugin: 'java'
+
+    group 'jsense'
+    status 'release'
+
+    sourceCompatibility = '1.6'
+    targetCompatibility = '1.6'
+
+    repositories {
+        mavenCentral()
+    }
+}
