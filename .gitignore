@@ -1,0 +1,19 @@
+## https://github.com/github/gitignore/blob/master/Java.gitignore
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+
+## https://github.com/github/gitignore/blob/master/Global/IntelliJ.gitignore
+*.iml
+*.ipr
+*.iws
+.idea/
+
+
+## Gradle
+.gradle
+build/
