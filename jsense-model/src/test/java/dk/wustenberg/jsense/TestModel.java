@@ -12,6 +12,12 @@ import org.junit.Test;
  */
 public class TestModel {
 
+    private static final float X = 0.1f;
+    private static final float Y = 0.2f;
+    private static final float Z = 0.3f;
+    
+    private static final float DELTA = 0.0001f;
+    
     private static final Instant NOW = Instant.now();
 
     @Test
@@ -20,23 +26,23 @@ public class TestModel {
 
         AccelerometerEvent accelerometerEvent = AccelerometerEvent.newBuilder()
                 .setTimestamp(NOW)
-                .setX(0.1f)
-                .setY(0.2f)
-                .setZ(0.3f)
+                .setX(X)
+                .setY(Y)
+                .setZ(Z)
                 .build();
 
         assertEquals(NOW, accelerometerEvent.getTimestamp());
-        assertEquals(0.1f, accelerometerEvent.getX(), 0.1f);
-        assertEquals(0.2f, accelerometerEvent.getY(), 0.1f);
-        assertEquals(0.3f, accelerometerEvent.getZ(), 0.1f);
+        assertEquals(X, accelerometerEvent.getX(), DELTA);
+        assertEquals(Y, accelerometerEvent.getY(), DELTA);
+        assertEquals(Z, accelerometerEvent.getZ(), DELTA);
     }
 
     @Test(expected = IllegalStateException.class)
     public void accelerometerEventNoTimestamp() {
         AccelerometerEvent.newBuilder()
-                .setX(0.1f)
-                .setY(0.2f)
-                .setZ(0.3f)
+                .setX(X)
+                .setY(Y)
+                .setZ(Z)
                 .build();
     }
 
@@ -44,8 +50,8 @@ public class TestModel {
     public void accelerometerEventNoX() {
         AccelerometerEvent.newBuilder()
                 .setTimestamp(NOW)
-                .setY(0.2f)
-                .setZ(0.3f)
+                .setY(Y)
+                .setZ(Z)
                 .build();
     }
 
@@ -53,8 +59,8 @@ public class TestModel {
     public void accelerometerEventNoY() {
         AccelerometerEvent.newBuilder()
                 .setTimestamp(NOW)
-                .setX(0.1f)
-                .setZ(0.3f)
+                .setX(X)
+                .setZ(Z)
                 .build();
     }
 
@@ -62,13 +68,13 @@ public class TestModel {
     public void accelerometerEventNoZ() {
         AccelerometerEvent.newBuilder()
                 .setTimestamp(NOW)
-                .setX(0.1f)
-                .setY(0.2f)
+                .setX(X)
+                .setY(Y)
                 .build();
     }
 
     @Test(expected = NullPointerException.class)
-    public void testAcceleterometerEventNullPointer() {
+    public void accelerometerEventNullPointer() {
         AccelerometerEvent.newBuilder()
                 .setTimestamp(null);
     }
