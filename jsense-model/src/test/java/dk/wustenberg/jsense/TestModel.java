@@ -1,9 +1,9 @@
 package dk.wustenberg.jsense;
 
-import static org.junit.Assert.*;
-
 import org.joda.time.Instant;
 import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 /**
  * Tests for the various model classes.
