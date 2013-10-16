@@ -43,15 +43,27 @@ public final class AccelerometerEvent {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o)  {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
 
         AccelerometerEvent that = (AccelerometerEvent) o;
 
-        if (Float.compare(that.x, x) != 0) return false;
-        if (Float.compare(that.y, y) != 0) return false;
-        if (Float.compare(that.z, z) != 0) return false;
-        if (!timestamp.equals(that.timestamp)) return false;
+        if (Float.compare(that.x, x) != 0) {
+            return false;
+        }
+        if (Float.compare(that.y, y) != 0) {
+            return false;
+        }
+        if (Float.compare(that.z, z) != 0) {
+            return false;
+        }
+        if (!timestamp.equals(that.timestamp)) {
+            return false;
+        }
 
         return true;
     }
@@ -71,6 +83,9 @@ public final class AccelerometerEvent {
                 .toString();
     }
 
+    /**
+     * A {@code Builder} for the AccelerometerEvent.
+     */
     public static final class Builder {
 
         private Instant timestamp;
