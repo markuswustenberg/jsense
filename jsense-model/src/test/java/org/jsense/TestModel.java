@@ -1,4 +1,4 @@
-package dk.wustenberg.jsense;
+package org.jsense;
 
 import org.joda.time.Instant;
 import org.junit.Test;

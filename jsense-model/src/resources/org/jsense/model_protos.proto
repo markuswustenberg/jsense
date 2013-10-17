@@ -1,4 +1,4 @@
-package dk.wustenberg.jsense;
+package org.jsense;
 
 message AccelerometerEventProto {
     optional int64 timestamp = 1;
