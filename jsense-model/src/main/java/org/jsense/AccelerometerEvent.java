@@ -1,4 +1,4 @@
-package dk.wustenberg.jsense;
+package org.jsense;
 
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
