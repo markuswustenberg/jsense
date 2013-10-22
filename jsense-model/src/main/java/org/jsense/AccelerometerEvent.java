@@ -3,11 +3,14 @@ package org.jsense;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.joda.time.Instant;
+import org.joda.time.ReadableInstant;
 
 /**
  * An {@code AccelerometerEvent} is a sample from a three-axis accelerometer, with an accurate timestamp.
+ * <p/>
+ * This class is thread-safe and immutable.
  *
- * @author Markus Wüstenberg (markus@wustenberg.dk)
+ * @author Markus Wüstenberg
  */
 public final class AccelerometerEvent {
 
@@ -43,7 +46,7 @@ public final class AccelerometerEvent {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o)  {
+        if (this == o) {
             return true;
         }
         if (o == null || getClass() != o.getClass()) {
@@ -90,11 +93,11 @@ public final class AccelerometerEvent {
 
         private Instant timestamp;
         private float x, y, z;
-
         private boolean hasTimestamp, hasX, hasY, hasZ;
 
-        public Builder setTimestamp(Instant timestamp) {
-            this.timestamp = Preconditions.checkNotNull(timestamp);
+        public Builder setTimestamp(ReadableInstant timestamp) {
+            Preconditions.checkNotNull(timestamp);
+            this.timestamp = timestamp.toInstant();
             hasTimestamp = true;
             return this;
         }
