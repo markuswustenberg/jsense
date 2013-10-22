@@ -1,5 +1,6 @@
 package org.jsense;
 
+import org.joda.time.Duration;
 import org.joda.time.Instant;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ public class TestModel {
     private static final float DELTA = 0.0001f;
     
     private static final Instant NOW = Instant.now();
+    private static final Duration UPTIME = new Duration(1234L);
 
     @Test
     public void accelerometerEvent() {
@@ -78,5 +80,42 @@ public class TestModel {
     public void accelerometerEventNullPointer() {
         AccelerometerEvent.newBuilder()
                 .setTimestamp(null);
+    }
+
+    @Test
+    public void accurateTime() {
+        AccurateTime accurateTime = AccurateTime.newBuilder()
+                .setTime(NOW)
+                .setReference(UPTIME)
+                .build();
+
+        assertTrue(NOW.isEqual(accurateTime.getTime()));
+        assertTrue(UPTIME.isEqual(accurateTime.getReference()));
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void accurateTimeNoTime() {
+        AccurateTime.newBuilder()
+                .setReference(UPTIME)
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void accurateTimeNoReference() {
+        AccurateTime.newBuilder()
+                .setTime(NOW)
+                .build();
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void accurateTimeTimeNullPointer() {
+        AccurateTime.newBuilder()
+                .setTime(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void accurateTimeReferenceNullPointer() {
+        AccurateTime.newBuilder()
+                .setReference(null);
     }
 }
