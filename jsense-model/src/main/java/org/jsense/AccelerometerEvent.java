@@ -1,5 +1,6 @@
 package org.jsense;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.Objects;
 import com.google.common.base.Preconditions;
 import org.joda.time.Instant;
@@ -12,6 +13,7 @@ import org.joda.time.ReadableInstant;
  *
  * @author Markus Wüstenberg
  */
+@Beta
 public final class AccelerometerEvent {
 
     private final Instant timestamp;
