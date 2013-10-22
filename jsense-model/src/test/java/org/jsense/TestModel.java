@@ -4,6 +4,7 @@ import org.joda.time.Instant;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the various model classes.
@@ -31,7 +32,7 @@ public class TestModel {
                 .setZ(Z)
                 .build();
 
-        assertEquals(NOW, accelerometerEvent.getTimestamp());
+        assertTrue(NOW.isEqual(accelerometerEvent.getTimestamp()));
         assertEquals(X, accelerometerEvent.getX(), DELTA);
         assertEquals(Y, accelerometerEvent.getY(), DELTA);
         assertEquals(Z, accelerometerEvent.getZ(), DELTA);
