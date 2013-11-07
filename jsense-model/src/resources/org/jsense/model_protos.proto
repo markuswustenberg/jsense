@@ -1,8 +1,0 @@
-package org.jsense;
-
-message AccelerometerEventProto {
-    optional int64 timestamp = 1;
-    optional float x = 2;
-    optional float y = 3;
-    optional float z = 4;
-}
