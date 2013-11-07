@@ -5,6 +5,7 @@ import org.jsense.compute.SampleBasedSlidingWindow;
 import org.junit.Test;
 
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 
 import static org.junit.Assert.*;
 
@@ -27,11 +28,11 @@ public class TestSlidingWindow {
     @Test
     public void testSampleBasedSlidingWindow() {
 
-        SampleBasedSlidingWindow<DummySample> slidingWindow = SampleBasedSlidingWindow.newBuilder()
+        SampleBasedSlidingWindow<DummySample> slidingWindow = SampleBasedSlidingWindow.<DummySample>newBuilder()
                 .setSize(WINDOW_SIZE)
                 .add(ImmutableList.of(new DummySample(FIRST_DUMMY_SAMPLE)))
                 .add(ImmutableList.of(new DummySample(SECOND_DUMMY_SAMPLE), new DummySample(THIRD_DUMMY_SAMPLE)))
-                .add(ImmutableList.of())
+                .add(ImmutableList.<DummySample>of())
                 .add(ImmutableList.of(new DummySample(FOURTH_DUMMY_SAMPLE), new DummySample(FIFTH_DUMMY_SAMPLE)))
                 .add(new DummySample(SIXTH_DUMMY_SAMPLE), new DummySample(SEVENTH_DUMMY_SAMPLE))
                 .build();
@@ -77,14 +78,80 @@ public class TestSlidingWindow {
         assertFalse(windowIterator.hasNext());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void sizeCantBeNegative() {
-        //fail();
+        SampleBasedSlidingWindow.newBuilder()
+                .setSize(-1);
     }
 
-    @Test
-    public void dataCantBeNull() {
-        //fail();
+    @Test(expected = NullPointerException.class)
+    public void firstAddCantBeNull() {
+        SampleBasedSlidingWindow.newBuilder()
+                .add(null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void varargCantBeNull() {
+        SampleBasedSlidingWindow.newBuilder()
+                .add(new DummySample(FIRST_DUMMY_SAMPLE), (Object[]) null);
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void secondVarargCantBeNull() {
+        SampleBasedSlidingWindow.newBuilder()
+                .add(new DummySample(FIRST_DUMMY_SAMPLE), new DummySample(SECOND_DUMMY_SAMPLE), null);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void illegalStateIfNoSize() {
+        SampleBasedSlidingWindow.newBuilder()
+                .add(new DummySample(FIRST_DUMMY_SAMPLE))
+                .build();
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void illegalStateIfNoData() {
+        SampleBasedSlidingWindow.newBuilder()
+                .setSize(WINDOW_SIZE)
+                .build();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void iteratorShouldBeUnmodifiable() {
+        SampleBasedSlidingWindow<DummySample> slidingWindow = SampleBasedSlidingWindow.<DummySample>newBuilder()
+                .setSize(WINDOW_SIZE)
+                .add(new DummySample(FIRST_DUMMY_SAMPLE))
+                .build();
+
+        Iterator<Iterable<DummySample>> iterator = slidingWindow.iterator();
+        iterator.next();
+        iterator.remove();
+    }
+
+    @Test(expected = UnsupportedOperationException.class)
+    public void windowIteratorShouldBeUnmodifiable() {
+        SampleBasedSlidingWindow<DummySample> slidingWindow = SampleBasedSlidingWindow.<DummySample>newBuilder()
+                .setSize(WINDOW_SIZE)
+                .add(new DummySample(FIRST_DUMMY_SAMPLE))
+                .build();
+
+        Iterator<Iterable<DummySample>> iterator = slidingWindow.iterator();
+        Iterable<DummySample> samples = iterator.next();
+        Iterator<DummySample> iterator2 = samples.iterator();
+        iterator2.remove();
+    }
+
+    @Test(expected = NoSuchElementException.class)
+    public void testNoMoreWindows() {
+        SampleBasedSlidingWindow<DummySample> slidingWindow = SampleBasedSlidingWindow.<DummySample>newBuilder()
+                .setSize(WINDOW_SIZE)
+                .add(new DummySample(FIRST_DUMMY_SAMPLE))
+                .build();
+
+        Iterator<Iterable<DummySample>> iterator = slidingWindow.iterator();
+
+        iterator.next();
+        iterator.next();
     }
 
     /**
