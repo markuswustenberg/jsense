@@ -1,0 +1,9 @@
+version '0.1.0'
+
+dependencies {
+    compile project(':jsense')
+
+    compile 'com.google.guava:guava:15.0'
+
+    testCompile 'junit:junit:4.+'
+}
