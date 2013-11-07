@@ -111,15 +111,11 @@
 
         <!-- http://checkstyle.sourceforge.net/config_imports.html -->
 
-        <module name="AvoidStarImport"/>
-
         <module name="IllegalImport"/>
 
         <module name="RedundantImport"/>
 
         <module name="UnusedImports"/>
-
-        <module name="ImportOrder"/>
 
         <!-- http://checkstyle.sourceforge.net/config_javadoc.html -->
 
