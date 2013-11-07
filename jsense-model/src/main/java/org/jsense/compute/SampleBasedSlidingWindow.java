@@ -66,15 +66,14 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
             Preconditions.checkNotNull(element);
             Preconditions.checkNotNull(elements);
 
-            if (elements.length == 0) {
-                return this;
-            }
-
             hasData = true;
 
             ImmutableList.Builder<E> listBuilder = ImmutableList.builder();
             listBuilder.add(element);
-            listBuilder.add(elements);
+
+            if (elements.length > 0) {
+                listBuilder.add(elements);
+            }
 
             data = Iterables.concat(data, listBuilder.build());
 
