@@ -111,11 +111,11 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
      */
     private class SampleBasedSlidingWindowIterator implements Iterator<Iterable<E>> {
 
-        private int skip;
+        private Iterable<E> skippedData = data;
 
         @Override
         public boolean hasNext() {
-            return !Iterables.isEmpty(getSkippedData());
+            return !Iterables.isEmpty(skippedData);
         }
 
         @Override
@@ -123,13 +123,9 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
             if (!hasNext()) {
                 throw new NoSuchElementException("No more elements.");
             }
-            Iterable<E> limitedData = Iterables.limit(getSkippedData(), size);
-            skip += size;
+            Iterable<E> limitedData = Iterables.limit(skippedData, size);
+            skippedData = Iterables.skip(skippedData, size);
             return limitedData;
-        }
-
-        private Iterable<E> getSkippedData() {
-            return Iterables.skip(data, skip);
         }
 
         @Override
