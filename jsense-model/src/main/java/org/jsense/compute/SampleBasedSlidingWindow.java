@@ -28,8 +28,6 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
     private final Iterable<E> data;
     private final int size;
 
-    private SampleBasedSlidingWindowIterator iterator;
-
     private SampleBasedSlidingWindow(Builder<E> builder) {
         this.data = Iterables.unmodifiableIterable(builder.data);
         this.size = builder.size;
@@ -40,11 +38,8 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
      * @return the iterator
      */
     @Override
-    public synchronized Iterator<Iterable<E>> iterator() {
-        if (iterator == null) {
-            iterator = new SampleBasedSlidingWindowIterator();
-        }
-        return iterator;
+    public Iterator<Iterable<E>> iterator() {
+        return new SampleBasedSlidingWindowIterator();
     }
 
     public static <E> Builder<E> newBuilder() {
