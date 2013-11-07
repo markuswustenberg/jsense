@@ -56,13 +56,14 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
         private Iterable<E> data = ImmutableList.of();
         private boolean hasSize, hasData;
 
-        public Builder setSize(int size) {
+        public Builder<E> setSize(int size) {
+            Preconditions.checkArgument(size >= 0, "Size can't be negative.");
             this.size = size;
             hasSize = true;
             return this;
         }
 
-        public Builder add(E element, E... elements) {
+        public Builder<E> add(E element, E... elements) {
             Preconditions.checkNotNull(element);
             Preconditions.checkNotNull(elements);
 
@@ -80,7 +81,7 @@ public final class SampleBasedSlidingWindow<E> implements Iterable<Iterable<E>> 
             return this;
         }
 
-        public Builder add(Iterable<E> elements) {
+        public Builder<E> add(Iterable<E> elements) {
             Preconditions.checkNotNull(elements);
             if (Iterables.isEmpty(elements)) {
                 return this;
