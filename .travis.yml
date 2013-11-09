@@ -3,4 +3,5 @@ notifications:
   hipchat:
     rooms:
       secure: nuC2O6GiQ02GwhA+ueEIxU4vfV6TmLySJ7Eh6bOoX0ft2fi6RXdxSjy+qJ9e20KDer3eqetCggzbPmtK7Kacau7ALyvSFSadGbWIZhcahWTw4R608ovQtF8Y7ae6RxZ2CMTcmhGZ2hCUgQoUNGxSmad2HIX/jm+zlDbCm/cU/k0=
+  irc: "chat.freenode.net#jsense"
   email: false
