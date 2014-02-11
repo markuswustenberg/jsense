@@ -1,4 +1,4 @@
-package org.jsense.serialize;
+package org.jsense.serialize.json;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.joda.time.Duration;
 import org.joda.time.Instant;
+import org.jsense.serialize.Serializer;
 
 import java.io.IOException;
 import java.io.OutputStream;

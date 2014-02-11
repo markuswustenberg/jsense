@@ -3,6 +3,7 @@ package org.jsense.serialize;
 import com.google.common.collect.ImmutableList;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
+import org.jsense.serialize.json.*;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -25,7 +26,7 @@ public class TestJsonDeserializer {
     private static final int SEED = 88951;
 
     private AccelerometerEvent accelerometerEvent, accelerometerEvent2;
-    private AccelerometerEventJsonDeserializer deserializer;
+    private AccelerometerEventDeserializer deserializer;
 
     @Before
     public void setUp() throws IOException {
@@ -33,7 +34,7 @@ public class TestJsonDeserializer {
         accelerometerEvent = ModelFactory.newRandomAccelerometerEvent();
         accelerometerEvent2 = ModelFactory.newRandomAccelerometerEvent();
 
-        deserializer = new AccelerometerEventJsonDeserializer();
+        deserializer = new AccelerometerEventDeserializer();
     }
 
     @Test

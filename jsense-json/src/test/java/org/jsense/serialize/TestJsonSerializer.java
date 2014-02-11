@@ -4,6 +4,7 @@ import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
+import org.jsense.serialize.json.JsonSerializer;
 import org.junit.Before;
 import org.junit.Test;
 

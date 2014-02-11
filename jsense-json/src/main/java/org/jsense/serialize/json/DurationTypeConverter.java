@@ -1,4 +1,4 @@
-package org.jsense.serialize;
+package org.jsense.serialize.json;
 
 import com.google.gson.*;
 import org.joda.time.Duration;

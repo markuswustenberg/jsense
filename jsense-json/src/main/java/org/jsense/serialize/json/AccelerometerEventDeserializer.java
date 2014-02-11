@@ -1,4 +1,4 @@
-package org.jsense.serialize;
+package org.jsense.serialize.json;
 
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
+import org.jsense.serialize.Deserializer;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -19,7 +20,7 @@ import java.util.Arrays;
  *
  * @author Markus Wüstenberg
  */
-public final class AccelerometerEventJsonDeserializer implements Deserializer<AccelerometerEvent> {
+public final class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(Instant.class, new InstantTypeConverter())
