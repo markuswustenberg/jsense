@@ -7,7 +7,11 @@ import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 
 /**
- * An {@code AccelerometerEvent} is a sample from a three-axis accelerometer, with an accurate timestamp.
+ * An {@code AccelerometerEvent} is a sample from a three-axis accelerometer, with an accurate absolute timestamp in
+ * milliseconds, and an optional relative timestamp in nanoseconds.
+ * <p/>
+ * Sample values are in m/s^2. The absolute timestamp is often for synchronising with other samples, and the relative
+ * timestamp is for comparing with samples from the same dataset with higher precision.
  * <p/>
  * This class is thread-safe and immutable.
  *
@@ -16,32 +20,83 @@ import org.joda.time.ReadableInstant;
 @Beta
 public final class AccelerometerEvent {
 
-    private final Instant timestamp;
+    private final Instant absoluteTimestamp;
+    private final boolean hasRelativeTimestamp;
+    private final long relativeTimestamp;
     private final float x, y, z;
 
     private AccelerometerEvent(Builder builder) {
-        timestamp = builder.timestamp;
+        absoluteTimestamp = builder.absoluteTimestamp;
+        hasRelativeTimestamp = builder.hasRelativeTimestamp;
+        if (hasRelativeTimestamp) {
+            relativeTimestamp = builder.relativeTimestamp;
+        } else {
+            relativeTimestamp = 0;
+        }
         x = builder.x;
         y = builder.y;
         z = builder.z;
     }
 
-    public Instant getTimestamp() {
-        return timestamp;
+    /**
+     * Get the absolute timestamp in milliseconds as an {@link org.joda.time.Instant}.
+     *
+     * @return The absolute timestamp.
+     */
+    public Instant getAbsoluteTimestamp() {
+        return absoluteTimestamp;
     }
 
+    /**
+     * Return if there exists a relative timestamp.
+     *
+     * @return If a relative timestamp exists.
+     */
+    public boolean hasRelativeTimestamp() {
+        return hasRelativeTimestamp;
+    }
+
+    /**
+     * Get the relative timestamp in nanoseconds.
+     *
+     * @return The relative timestamp.
+     */
+    public long getRelativeTimestamp() {
+        return relativeTimestamp;
+    }
+
+    /**
+     * Get the x-axis sample value in m/s^2.
+     *
+     * @return The x-axis sample value in m/s^2.
+     */
     public float getX() {
         return x;
     }
 
+    /**
+     * Get the y-axis sample value in m/s^2.
+     *
+     * @return The y-axis sample value in m/s^2.
+     */
     public float getY() {
         return y;
     }
 
+    /**
+     * Get the z-axis sample value in m/s^2.
+     *
+     * @return The z-axis sample value in m/s^2.
+     */
     public float getZ() {
         return z;
     }
 
+    /**
+     * Get a new {@code Builder} for building an {@code AccelerometerEvent}.
+     *
+     * @return A new {@code Builder}.
+     */
     public static Builder newBuilder() {
         return new Builder();
     }
@@ -57,6 +112,12 @@ public final class AccelerometerEvent {
 
         AccelerometerEvent that = (AccelerometerEvent) o;
 
+        if (hasRelativeTimestamp != that.hasRelativeTimestamp) {
+            return false;
+        }
+        if (relativeTimestamp != that.relativeTimestamp) {
+            return false;
+        }
         if (Float.compare(that.x, x) != 0) {
             return false;
         }
@@ -66,7 +127,7 @@ public final class AccelerometerEvent {
         if (Float.compare(that.z, z) != 0) {
             return false;
         }
-        if (!timestamp.equals(that.timestamp)) {
+        if (!absoluteTimestamp.equals(that.absoluteTimestamp)) {
             return false;
         }
 
@@ -75,13 +136,20 @@ public final class AccelerometerEvent {
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(timestamp, x, y, z);
+        return Objects.hashCode(absoluteTimestamp, hasRelativeTimestamp, relativeTimestamp, x, y, z);
     }
 
     @Override
     public String toString() {
-        return Objects.toStringHelper(this)
-                .add("timestamp", timestamp)
+        Objects.ToStringHelper toStringHelper = Objects.toStringHelper(this)
+                .add("absoluteTimestamp", absoluteTimestamp)
+                .add("hasRelativeTimestamp", hasRelativeTimestamp);
+
+        if (hasRelativeTimestamp) {
+            toStringHelper.add("relativeTimestamp", relativeTimestamp);
+        }
+
+        return toStringHelper
                 .add("x", x)
                 .add("y", y)
                 .add("z", z)
@@ -89,18 +157,25 @@ public final class AccelerometerEvent {
     }
 
     /**
-     * A {@code Builder} for the AccelerometerEvent.
+     * A {@code Builder} for the {@code AccelerometerEvent}.
      */
     public static final class Builder {
 
-        private Instant timestamp;
+        private Instant absoluteTimestamp;
+        private long relativeTimestamp;
         private float x, y, z;
-        private boolean hasTimestamp, hasX, hasY, hasZ;
+        private boolean hasAbsoluteTimestamp, hasRelativeTimestamp, hasX, hasY, hasZ;
 
-        public Builder setTimestamp(ReadableInstant timestamp) {
-            Preconditions.checkNotNull(timestamp);
-            this.timestamp = timestamp.toInstant();
-            hasTimestamp = true;
+        public Builder setAbsoluteTimestamp(ReadableInstant absoluteTimestamp) {
+            Preconditions.checkNotNull(absoluteTimestamp);
+            this.absoluteTimestamp = absoluteTimestamp.toInstant();
+            hasAbsoluteTimestamp = true;
+            return this;
+        }
+
+        public Builder setRelativeTimestamp(long relativeTimestamp) {
+            this.relativeTimestamp = relativeTimestamp;
+            hasRelativeTimestamp = true;
             return this;
         }
 
@@ -123,8 +198,8 @@ public final class AccelerometerEvent {
         }
 
         public AccelerometerEvent build() {
-            if (!hasTimestamp || !hasX || !hasY || !hasZ) {
-                throw new IllegalStateException("One of timestamp, x, y, or z hasn't been set.");
+            if (!hasAbsoluteTimestamp || !hasX || !hasY || !hasZ) {
+                throw new IllegalStateException("One of absoluteTimestamp, x, y, or z hasn't been set.");
             }
             return new AccelerometerEvent(this);
         }

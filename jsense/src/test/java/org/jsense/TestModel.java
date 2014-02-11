@@ -5,12 +5,13 @@ import org.joda.time.Instant;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for the various model classes.
  *
- * @author Markus Wüstenberg (markus@wustenberg.dk)
+ * @author Markus Wüstenberg
  */
 public class TestModel {
 
@@ -28,16 +29,31 @@ public class TestModel {
         // Basics
 
         AccelerometerEvent accelerometerEvent = AccelerometerEvent.newBuilder()
-                .setTimestamp(NOW)
+                .setAbsoluteTimestamp(NOW)
                 .setX(X)
                 .setY(Y)
                 .setZ(Z)
                 .build();
 
-        assertTrue(NOW.isEqual(accelerometerEvent.getTimestamp()));
+        assertTrue(NOW.isEqual(accelerometerEvent.getAbsoluteTimestamp()));
+        assertFalse(accelerometerEvent.hasRelativeTimestamp());
         assertEquals(X, accelerometerEvent.getX(), DELTA);
         assertEquals(Y, accelerometerEvent.getY(), DELTA);
         assertEquals(Z, accelerometerEvent.getZ(), DELTA);
+    }
+
+    @Test
+    public void testAccelerometerEventWithRelativeTimestamp() {
+        AccelerometerEvent accelerometerEvent = AccelerometerEvent.newBuilder()
+                .setAbsoluteTimestamp(NOW)
+                .setRelativeTimestamp(UPTIME.getMillis())
+                .setX(X)
+                .setY(Y)
+                .setZ(Z)
+                .build();
+
+        assertTrue(accelerometerEvent.hasRelativeTimestamp());
+        assertEquals(UPTIME.getMillis(), accelerometerEvent.getRelativeTimestamp());
     }
 
     @Test(expected = IllegalStateException.class)
@@ -52,7 +68,7 @@ public class TestModel {
     @Test(expected = IllegalStateException.class)
     public void accelerometerEventNoX() {
         AccelerometerEvent.newBuilder()
-                .setTimestamp(NOW)
+                .setAbsoluteTimestamp(NOW)
                 .setY(Y)
                 .setZ(Z)
                 .build();
@@ -61,7 +77,7 @@ public class TestModel {
     @Test(expected = IllegalStateException.class)
     public void accelerometerEventNoY() {
         AccelerometerEvent.newBuilder()
-                .setTimestamp(NOW)
+                .setAbsoluteTimestamp(NOW)
                 .setX(X)
                 .setZ(Z)
                 .build();
@@ -70,7 +86,7 @@ public class TestModel {
     @Test(expected = IllegalStateException.class)
     public void accelerometerEventNoZ() {
         AccelerometerEvent.newBuilder()
-                .setTimestamp(NOW)
+                .setAbsoluteTimestamp(NOW)
                 .setX(X)
                 .setY(Y)
                 .build();
@@ -79,7 +95,7 @@ public class TestModel {
     @Test(expected = NullPointerException.class)
     public void accelerometerEventNullPointer() {
         AccelerometerEvent.newBuilder()
-                .setTimestamp(null);
+                .setAbsoluteTimestamp(null);
     }
 
     @Test

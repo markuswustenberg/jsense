@@ -20,7 +20,7 @@ public abstract class ModelFactory {
 
     public static AccelerometerEvent newRandomAccelerometerEvent() {
         return AccelerometerEvent.newBuilder()
-                .setTimestamp(new Instant(random.nextLong()))
+                .setAbsoluteTimestamp(new Instant(random.nextLong()))
                 .setX(random.nextFloat())
                 .setY(random.nextFloat())
                 .setZ(random.nextFloat())
