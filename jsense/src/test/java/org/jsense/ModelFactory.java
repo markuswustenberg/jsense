@@ -1,7 +1,5 @@
 package org.jsense;
 
-import com.sun.org.apache.regexp.internal.recompile;
-import org.joda.time.Duration;
 import org.joda.time.Instant;
 
 import java.util.Random;
@@ -43,12 +41,4 @@ public abstract class ModelFactory {
                 .setZ(random.nextFloat())
                 .build();
     }
-
-    public static AccurateTime newRandomAccurateTime() {
-        return AccurateTime.newBuilder()
-                .setTime(new Instant(random.nextLong()))
-                .setReference(new Duration(random.nextLong()))
-                .build();
-    }
-
 }

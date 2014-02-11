@@ -97,41 +97,4 @@ public class TestModel {
         AccelerometerEvent.newBuilder()
                 .setAbsoluteTimestamp(null);
     }
-
-    @Test
-    public void accurateTime() {
-        AccurateTime accurateTime = AccurateTime.newBuilder()
-                .setTime(NOW)
-                .setReference(UPTIME)
-                .build();
-
-        assertTrue(NOW.isEqual(accurateTime.getTime()));
-        assertTrue(UPTIME.isEqual(accurateTime.getReference()));
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void accurateTimeNoTime() {
-        AccurateTime.newBuilder()
-                .setReference(UPTIME)
-                .build();
-    }
-
-    @Test(expected = IllegalStateException.class)
-    public void accurateTimeNoReference() {
-        AccurateTime.newBuilder()
-                .setTime(NOW)
-                .build();
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void accurateTimeTimeNullPointer() {
-        AccurateTime.newBuilder()
-                .setTime(null);
-    }
-
-    @Test(expected = NullPointerException.class)
-    public void accurateTimeReferenceNullPointer() {
-        AccurateTime.newBuilder()
-                .setReference(null);
-    }
 }

@@ -25,7 +25,7 @@ public interface Serializer<T> {
      * Writes serialized data to the {@link java.io.OutputStream} and flushes.
      *
      * @param out The {@link java.io.OutputStream} to write to.
-     * @throws {@link java.io.IOException} If there is a problem writing to {@code out}.
+     * @throws IOException If there is a problem writing to {@code out}.
      */
     void to(OutputStream out) throws IOException;
 }
