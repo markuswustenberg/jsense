@@ -28,5 +28,4 @@ public interface Serializer<T> {
      * @throws {@link java.io.IOException} If there is a problem writing to {@code out}.
      */
     void to(OutputStream out) throws IOException;
-
 }
