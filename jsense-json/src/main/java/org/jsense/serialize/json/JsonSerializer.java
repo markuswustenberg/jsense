@@ -39,9 +39,7 @@ public final class JsonSerializer<T> implements Serializer<T> {
 
     @Override
     public void to(OutputStream out) throws IOException {
-        if (!hasData) {
-            throw new IllegalStateException("Nothing to serialize.");
-        }
+        Preconditions.checkState(hasData, "Nothing to serialize.");
         OutputStreamWriter writer = new OutputStreamWriter(Preconditions.checkNotNull(out), Charsets.UTF_8);
         gson.toJson(value, writer);
         writer.flush();

@@ -19,10 +19,10 @@ public interface Serializer<T> {
     /**
      * Set the data to be serialized.
      *
-     * @param value The data.
+     * @param values The data.
      * @return The {@code Serializer}, for method chaining.
      */
-    Serializer<T> serialize(Iterable<T> value);
+    Serializer<T> serialize(Iterable<T> values);
 
     /**
      * Writes serialized data to the {@link java.io.OutputStream} and flushes.

@@ -32,48 +32,48 @@ public class TestJsonSerializer {
 
     private ByteArrayOutputStream out;
 
-    private JsonSerializer<AccelerometerEvent> accelerometerEventSerializer;
+    private Serializer<AccelerometerEvent> serializer;
 
-    private AccelerometerEvent accelerometerEvent, accelerometerEvent2;
+    private AccelerometerEvent event1, event2;
 
     @Before
     public void setUp() {
         out = new ByteArrayOutputStream();
 
-        accelerometerEventSerializer = new JsonSerializer<AccelerometerEvent>();
+        serializer = new JsonSerializer<AccelerometerEvent>();
 
         ModelFactory.setSeed(SEED);
-        accelerometerEvent = ModelFactory.newRandomAccelerometerEvent();
-        accelerometerEvent2 = ModelFactory.newRandomAccelerometerEvent();
+        event1 = ModelFactory.newRandomAccelerometerEvent();
+        event2 = ModelFactory.newRandomAccelerometerEvent();
     }
 
     @Test
     public void serializeSingleAccelerometerEvent() throws IOException {
-        accelerometerEventSerializer.serialize(ImmutableList.of(accelerometerEvent))
+        serializer.serialize(ImmutableList.of(event1))
                 .to(out);
         assertEquals(ACCELEROMETER_EVENT_JSON, out.toString(Charsets.UTF_8.name()));
     }
 
     @Test
     public void serializeTwoAccelerometerEvents() throws IOException {
-        accelerometerEventSerializer.serialize(ImmutableList.of(accelerometerEvent2, accelerometerEvent))
+        serializer.serialize(ImmutableList.of(event2, event1))
                 .to(out);
         assertEquals(ACCELEROMETER_EVENTS_JSON, out.toString(Charsets.UTF_8.name()));
     }
 
     @Test(expected = NullPointerException.class)
     public void serializeValueCantBeNull() {
-        accelerometerEventSerializer.serialize(null);
+        serializer.serialize(null);
     }
 
     @Test(expected = NullPointerException.class)
     public void outputStreamCantBeNull() throws IOException {
-        accelerometerEventSerializer.serialize(ImmutableList.of(accelerometerEvent))
+        serializer.serialize(ImmutableList.of(event1))
                 .to(null);
     }
 
     @Test(expected = IllegalStateException.class)
     public void serializerMustHaveData() throws IOException {
-        accelerometerEventSerializer.to(new ByteArrayOutputStream());
+        serializer.to(new ByteArrayOutputStream());
     }
 }
