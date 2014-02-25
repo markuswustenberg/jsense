@@ -1,4 +1,15 @@
+apply plugin: 'protobuf'
+
 version '0.1.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'ws.antonov.gradle.plugins:gradle-plugin-protobuf:0.8'
+    }
+}
 
 dependencies {
     compile project(':jsense')
