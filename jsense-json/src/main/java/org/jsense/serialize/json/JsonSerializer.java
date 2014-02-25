@@ -1,5 +1,6 @@
 package org.jsense.serialize.json;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
@@ -18,6 +19,7 @@ import java.io.OutputStreamWriter;
  * @param <T> The type of data to be serialized.
  * @author Markus Wüstenberg
  */
+@Beta
 public final class JsonSerializer<T> implements Serializer<T> {
 
     private final Gson gson = new GsonBuilder()

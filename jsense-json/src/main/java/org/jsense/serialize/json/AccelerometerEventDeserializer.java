@@ -1,5 +1,6 @@
 package org.jsense.serialize.json;
 
+import com.google.common.annotations.Beta;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.gson.Gson;
@@ -20,6 +21,7 @@ import java.util.Arrays;
  *
  * @author Markus Wüstenberg
  */
+@Beta
 public final class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
 
     private final Gson gson = new GsonBuilder()

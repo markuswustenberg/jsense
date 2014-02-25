@@ -1,5 +1,7 @@
 package org.jsense.serialize;
 
+import com.google.common.annotations.Beta;
+
 import java.io.IOException;
 import java.io.OutputStream;
 
@@ -11,6 +13,7 @@ import java.io.OutputStream;
  * @param <T> The type of data to be serialized.
  * @author Markus Wüstenberg
  */
+@Beta
 public interface Serializer<T> {
 
     /**
