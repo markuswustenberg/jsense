@@ -1,0 +1,9 @@
+package org.jsense.serialize.protobuf;
+
+message ThreeAxisSensorEvent {
+    optional int64 absolute_timestamp = 1;
+    optional int64 relative_timestamp = 2;
+    optional float x = 3;
+    optional float y = 4;
+    optional float z = 5;
+}
