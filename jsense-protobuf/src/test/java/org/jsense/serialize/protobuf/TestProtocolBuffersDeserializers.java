@@ -66,7 +66,7 @@ public class TestProtocolBuffersDeserializers {
 
     private InputStream getInputStreamFrom(Iterable<AccelerometerEvent> events) throws IOException {
         ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new AccelerometerEventProtocolBuffersSerializer()
+        new AccelerometerEventSerializer()
                 .serialize(events)
                 .to(out);
         return new ByteArrayInputStream(out.toByteArray());

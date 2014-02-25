@@ -36,7 +36,7 @@ public class TestProtocolBuffersSerializers {
     public void setUp() {
         out = new ByteArrayOutputStream();
 
-        serializer = new AccelerometerEventProtocolBuffersSerializer();
+        serializer = new AccelerometerEventSerializer();
 
         ModelFactory.setSeed(SEED);
         event1 = ModelFactory.newRandomAccelerometerEvent();

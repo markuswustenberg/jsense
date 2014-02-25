@@ -17,7 +17,7 @@ import java.io.OutputStream;
  * @author Markus Wüstenberg
  */
 @Beta
-public final class AccelerometerEventProtocolBuffersSerializer implements Serializer<AccelerometerEvent> {
+public final class AccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
 
     private Iterable<AccelerometerEvent> events;
     private boolean hasEvents;
