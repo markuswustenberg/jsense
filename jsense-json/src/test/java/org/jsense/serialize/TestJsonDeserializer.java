@@ -25,38 +25,43 @@ public class TestJsonDeserializer {
 
     private static final int SEED = 88951;
 
-    private AccelerometerEvent accelerometerEvent, accelerometerEvent2;
-    private AccelerometerEventDeserializer deserializer;
+    private AccelerometerEvent event1, event2;
+    private Deserializer<AccelerometerEvent> deserializer;
 
     @Before
     public void setUp() throws IOException {
         ModelFactory.setSeed(SEED);
-        accelerometerEvent = ModelFactory.newRandomAccelerometerEvent();
-        accelerometerEvent2 = ModelFactory.newRandomAccelerometerEvent();
+        event1 = ModelFactory.newRandomAccelerometerEvent();
+        event2 = ModelFactory.newRandomAccelerometerEvent();
 
         deserializer = new AccelerometerEventDeserializer();
     }
 
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
-        InputStream in = getInputStreamFrom(ImmutableList.of(accelerometerEvent));
+        InputStream in = getInputStreamFrom(ImmutableList.of(event1));
         Iterable<AccelerometerEvent> events = deserializer.from(in);
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
         assertTrue(eventsIterator.hasNext());
-        assertEquals(accelerometerEvent, eventsIterator.next());
+        assertEquals(event1, eventsIterator.next());
     }
 
     @Test
     public void deserializeMultipleAccelerometerEvents() throws IOException {
-        InputStream in = getInputStreamFrom(ImmutableList.of(accelerometerEvent, accelerometerEvent2));
+        InputStream in = getInputStreamFrom(ImmutableList.of(event1, event2));
         Iterable<AccelerometerEvent> events = deserializer.from(in);
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
         assertTrue(eventsIterator.hasNext());
-        assertEquals(accelerometerEvent, eventsIterator.next());
+        assertEquals(event1, eventsIterator.next());
         assertTrue(eventsIterator.hasNext());
-        assertEquals(accelerometerEvent2, eventsIterator.next());
+        assertEquals(event2, eventsIterator.next());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void inputStreamCantBeNull() throws IOException {
+        deserializer.from(null);
     }
 
     private InputStream getInputStreamFrom(Iterable<AccelerometerEvent> events) throws IOException {
