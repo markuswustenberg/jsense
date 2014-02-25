@@ -1,5 +1,6 @@
 subprojects {
     apply plugin: 'java'
+    apply plugin: 'maven-publish'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
 
@@ -30,6 +31,21 @@ subprojects {
     }
     checkstyleTest {
         classpath += configurations.compile
+    }
+
+    task sourceJar(type: Jar) {
+        from sourceSets.main.allJava
+    }
+
+    publishing {
+        publications {
+            java(MavenPublication) {
+                from components.java
+                artifact sourceJar {
+                    classifier "sources"
+                }
+            }
+        }
     }
 }
 
