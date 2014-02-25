@@ -1,4 +1,4 @@
-package org.jsense.serialize.protobuf;
+package org.jsense.serialize.protobuf.gen;
 
 message ThreeAxisSensorEvent {
     optional int64 absolute_timestamp = 1;

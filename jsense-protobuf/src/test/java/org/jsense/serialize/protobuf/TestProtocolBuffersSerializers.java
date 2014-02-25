@@ -4,6 +4,7 @@ import com.google.common.collect.ImmutableList;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
 import org.jsense.serialize.Serializer;
+import org.jsense.serialize.protobuf.gen.ProtoModel;
 import org.junit.Before;
 import org.junit.Test;
 

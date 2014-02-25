@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Deserializer;
+import org.jsense.serialize.protobuf.gen.ProtoModel;
 
 import java.io.IOException;
 import java.io.InputStream;

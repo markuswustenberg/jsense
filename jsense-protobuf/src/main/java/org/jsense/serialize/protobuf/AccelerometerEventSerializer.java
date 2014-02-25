@@ -4,6 +4,7 @@ import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Serializer;
+import org.jsense.serialize.protobuf.gen.ProtoModel;
 
 import java.io.IOException;
 import java.io.OutputStream;
