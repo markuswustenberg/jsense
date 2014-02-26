@@ -10,16 +10,19 @@ buildscript {
         classpath 'ws.antonov.gradle.plugins:gradle-plugin-protobuf:0.8'
     }
 }
-findbugs {
-    excludeFilter = file("$projectDir/config/findbugs/excludeFilter.xml")
-}
 
-def excludePattern = '**/org/jsense/serialize/protobuf/gen/*'
+def excludePattern = '/org/jsense/serialize/protobuf/gen/'
+def excludePatternAntStyle = '**' + excludePattern + '*'
+tasks.withType(FindBugs) {
+    classes = classes.filter {
+        !it.path.contains(excludePattern)
+    }
+}
 tasks.withType(Checkstyle) {
-    exclude excludePattern
+    exclude excludePatternAntStyle
 }
 tasks.withType(Pmd) {
-    exclude excludePattern
+    exclude excludePatternAntStyle
 }
 
 dependencies {
