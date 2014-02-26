@@ -4,7 +4,16 @@ notifications:
   irc: "chat.freenode.net#jsense"
   email: false
 
+env:
+  - TERM=dumb
+
 before_install:
   - echo 'yes' | sudo add-apt-repository ppa:chris-lea/protobuf
-  - sudo apt-get update -qq
-  - sudo apt-get install -qq protobuf-compiler
+  - sudo apt-get update
+  - sudo apt-get install protobuf-compiler
+
+install:
+  - ./gradlew assemble -s
+
+script:
+  - ./gradlew check -s
