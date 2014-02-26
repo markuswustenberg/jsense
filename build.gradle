@@ -23,14 +23,7 @@ subprojects {
 
     checkstyle {
         configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
-    }
-
-    // See http://forums.gradle.org/gradle/topics/checkstyle_complaining_about_unable_to_get_class_information_for_in_1_0_milestone_6#reply_10990810
-    checkstyleMain {
-        classpath += configurations.compile
-    }
-    checkstyleTest {
-        classpath += configurations.compile
+        showViolations = false
     }
 
     task sourceJar(type: Jar) {
