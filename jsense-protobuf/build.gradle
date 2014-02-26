@@ -1,0 +1,34 @@
+apply plugin: 'protobuf'
+
+version '0.1.0'
+
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'ws.antonov.gradle.plugins:gradle-plugin-protobuf:0.8'
+    }
+}
+findbugs {
+    excludeFilter = file("$projectDir/config/findbugs/excludeFilter.xml")
+}
+
+def excludePattern = '**/org/jsense/serialize/protobuf/gen/*'
+tasks.withType(Checkstyle) {
+    exclude excludePattern
+}
+tasks.withType(Pmd) {
+    exclude excludePattern
+}
+
+dependencies {
+    compile project(':jsense')
+
+    compile 'com.google.guava:guava:16.0.1'
+    compile 'com.google.protobuf:protobuf-java:2.5.0'
+    compile 'joda-time:joda-time:2.3'
+
+    testCompile 'junit:junit:4.+'
+    testCompile project(':jsense').sourceSets.test.output
+}
