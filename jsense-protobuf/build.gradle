@@ -11,13 +11,18 @@ buildscript {
     }
 }
 
+def excludeFilter = '**/org/jsense/serialize/protobuf/gen/*'
 tasks.withType(FindBugs) {
-    exclude '**/org/jsense/serialize/protobuf/gen/*'
+    exclude excludeFilter
     ignoreFailures = true
 }
 
 tasks.withType(Checkstyle) {
-    exclude '**/org/jsense/serialize/protobuf/gen/**'
+    exclude excludeFilter
+}
+
+tasks.withType(Pmd) {
+    exclude excludeFilter
 }
 
 dependencies {
