@@ -12,6 +12,8 @@ before_install:
   - sudo apt-get update
   - sudo apt-get install protobuf-compiler
   - cat /etc/ld.so.conf
+  - cat /etc/ld.so.conf.d/*.conf
+  - find /usr -name libprotobuf.so.8
   - sudo ldconfig
 
 install:
