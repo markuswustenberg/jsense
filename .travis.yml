@@ -6,6 +6,7 @@ notifications:
 
 env:
   - TERM=dumb
+  - LD_LIBRARY_PATH=/usr/local/lib
 
 before_install:
   - echo 'yes' | sudo add-apt-repository ppa:chris-lea/protobuf
