@@ -3,6 +3,7 @@ subprojects {
     apply plugin: 'maven-publish'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
+    apply plugin: 'pmd'
 
     group 'org.jsense'
     status 'release'
