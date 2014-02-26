@@ -11,6 +11,8 @@ before_install:
   - echo 'yes' | sudo add-apt-repository ppa:chris-lea/protobuf
   - sudo apt-get update
   - sudo apt-get install protobuf-compiler
+  - cat /etc/ld.so.conf
+  - sudo ldconfig
 
 install:
   - ./gradlew assemble -s
