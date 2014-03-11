@@ -3,6 +3,7 @@ package org.jsense.serialize.simple;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Serializer;
 
@@ -38,6 +39,7 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
     public void to(OutputStream out) throws IOException {
         Preconditions.checkNotNull(out);
         Preconditions.checkState(values != null);
+        Preconditions.checkState(!Iterables.isEmpty(values));
 
         BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, Charsets.UTF_8));
         for (AccelerometerEvent event : values) {

@@ -3,6 +3,7 @@ package org.jsense.serialize.json;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.joda.time.Duration;
@@ -27,21 +28,20 @@ public final class JsonSerializer<T> implements Serializer<T> {
             .registerTypeAdapter(Duration.class, new DurationTypeConverter())
             .create();
 
-    private Iterable<T> value;
-    private boolean hasData;
+    private Iterable<T> values;
 
     @Override
-    public Serializer<T> serialize(Iterable<T> value) {
-        this.value = Preconditions.checkNotNull(value);
-        hasData = true;
+    public Serializer<T> serialize(Iterable<T> values) {
+        this.values = Preconditions.checkNotNull(values);
         return this;
     }
 
     @Override
     public void to(OutputStream out) throws IOException {
-        Preconditions.checkState(hasData, "Nothing to serialize.");
+        Preconditions.checkState(values != null, "Nothing to serialize.");
+        Preconditions.checkState(!Iterables.isEmpty(values));
         OutputStreamWriter writer = new OutputStreamWriter(Preconditions.checkNotNull(out), Charsets.UTF_8);
-        gson.toJson(value, writer);
+        gson.toJson(values, writer);
         writer.flush();
     }
 }

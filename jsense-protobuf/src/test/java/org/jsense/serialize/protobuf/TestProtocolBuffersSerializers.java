@@ -1,6 +1,7 @@
 package org.jsense.serialize.protobuf;
 
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
 import org.jsense.serialize.Serializer;
@@ -89,6 +90,12 @@ public class TestProtocolBuffersSerializers {
 
     @Test(expected = IllegalStateException.class)
     public void serializerMustHaveData() throws IOException {
-        serializer.to(new ByteArrayOutputStream());
+        serializer.to(out);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void serializerMustHaveNonEmptyData() throws IOException {
+        serializer.serialize(Lists.<AccelerometerEvent>newArrayList())
+                .to(out);
     }
 }

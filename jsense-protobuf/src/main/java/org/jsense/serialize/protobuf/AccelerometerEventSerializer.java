@@ -2,6 +2,7 @@ package org.jsense.serialize.protobuf;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Iterables;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Serializer;
 import org.jsense.serialize.protobuf.gen.ProtoModel;
@@ -21,19 +22,18 @@ import java.io.OutputStream;
 public final class AccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
 
     private Iterable<AccelerometerEvent> events;
-    private boolean hasEvents;
 
     @Override
     public Serializer<AccelerometerEvent> serialize(Iterable<AccelerometerEvent> values) {
         this.events = Preconditions.checkNotNull(values);
-        hasEvents = true;
         return this;
     }
 
     @Override
     public void to(OutputStream out) throws IOException {
-        Preconditions.checkState(hasEvents, "Nothing to serialize.");
         Preconditions.checkNotNull(out);
+        Preconditions.checkState(events != null, "Nothing to serialize.");
+        Preconditions.checkState(!Iterables.isEmpty(events));
 
         ProtoModel.ThreeAxisSensorEvent.Builder builder = ProtoModel.ThreeAxisSensorEvent.newBuilder();
         // Go through the events and write them one at a time, so we don't have to load everything into memory

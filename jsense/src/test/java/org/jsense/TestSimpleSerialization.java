@@ -2,6 +2,7 @@ package org.jsense;
 
 import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
+import com.google.common.collect.Lists;
 import org.jsense.serialize.Deserializer;
 import org.jsense.serialize.Serializer;
 import org.jsense.serialize.simple.AccelerometerEventDeserializer;
@@ -19,7 +20,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for the SimpleSerializer.
+ * Tests for the {@link org.jsense.serialize.simple.AccelerometerEventSerializer} and {@link org.jsense.serialize.simple.AccelerometerEventDeserializer}.
  *
  * @author Markus Wüstenberg
  */
@@ -77,7 +78,13 @@ public class TestSimpleSerialization {
 
     @Test(expected = IllegalStateException.class)
     public void serializerMustHaveData() throws IOException {
-        serializer.to(new ByteArrayOutputStream());
+        serializer.to(out);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void serializerMustHaveNonEmptyData() throws IOException {
+        serializer.serialize(Lists.<AccelerometerEvent>newArrayList())
+                .to(out);
     }
 
     @Test

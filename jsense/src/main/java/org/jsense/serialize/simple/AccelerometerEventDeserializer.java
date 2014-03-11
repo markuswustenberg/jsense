@@ -17,6 +17,8 @@ import java.util.List;
  * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of
  * {@link org.jsense.AccelerometerEvent}s.
  *
+ * Currently loads all events into memory.
+ *
  * @author Markus Wüstenberg
  */
 public class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
