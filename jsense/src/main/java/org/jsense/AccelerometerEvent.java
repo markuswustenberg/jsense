@@ -57,11 +57,13 @@ public final class AccelerometerEvent {
     }
 
     /**
-     * Get the relative timestamp in nanoseconds.
+     * Get the relative timestamp in nanoseconds. This only makes sense if {@link #hasRelativeTimestamp()} returns true,
+     * and throws an {@link java.lang.IllegalStateException} if called anyway.
      *
      * @return The relative timestamp.
      */
     public long getRelativeTimestamp() {
+        Preconditions.checkState(hasRelativeTimestamp, "No relative timestamp exists.");
         return relativeTimestamp;
     }
 
@@ -93,9 +95,9 @@ public final class AccelerometerEvent {
     }
 
     /**
-     * Get a new {@code Builder} for building an {@code AccelerometerEvent}.
+     * Get a new {@link Builder} for building an {@code AccelerometerEvent}.
      *
-     * @return A new {@code Builder}.
+     * @return A new {@link Builder}.
      */
     public static Builder newBuilder() {
         return new Builder();
@@ -157,7 +159,7 @@ public final class AccelerometerEvent {
     }
 
     /**
-     * A {@code Builder} for the {@code AccelerometerEvent}.
+     * A {@code Builder} for the {@link AccelerometerEvent}.
      */
     public static final class Builder {
 
@@ -198,9 +200,7 @@ public final class AccelerometerEvent {
         }
 
         public AccelerometerEvent build() {
-            if (!hasAbsoluteTimestamp || !hasX || !hasY || !hasZ) {
-                throw new IllegalStateException("One of absoluteTimestamp, x, y, or z hasn't been set.");
-            }
+            Preconditions.checkState(hasAbsoluteTimestamp && hasX && hasY && hasZ, "One of absoluteTimestamp, x, y, or z hasn't been set.");
             return new AccelerometerEvent(this);
         }
     }

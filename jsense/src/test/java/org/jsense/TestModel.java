@@ -97,4 +97,15 @@ public class TestModel {
         AccelerometerEvent.newBuilder()
                 .setAbsoluteTimestamp(null);
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void getterOnNoRelativeTimestampIsIllegal() {
+        AccelerometerEvent event = AccelerometerEvent.newBuilder()
+                .setAbsoluteTimestamp(NOW)
+                .setX(X)
+                .setY(Y)
+                .setZ(Z)
+                .build();
+        event.getRelativeTimestamp();
+    }
 }
