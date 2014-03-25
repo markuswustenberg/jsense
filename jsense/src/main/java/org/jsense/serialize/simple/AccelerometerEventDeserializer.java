@@ -16,12 +16,14 @@ import java.util.List;
 /**
  * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of
  * {@link org.jsense.AccelerometerEvent}s.
- *
+ * <p/>
  * Currently loads all events into memory.
+ * <p/>
+ * This class is thread-safe.
  *
  * @author Markus Wüstenberg
  */
-public class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
+public final class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
 
     private static final String STANDARD_DELIMITER = ",";
 

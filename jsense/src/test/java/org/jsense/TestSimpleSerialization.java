@@ -120,4 +120,22 @@ public class TestSimpleSerialization {
                 .to(out);
         return new ByteArrayInputStream(out.toByteArray());
     }
+
+    @Test
+    public void serializeSingleAccelerometerEventSimply() {
+        String serialized = AccelerometerEventSerializer.serializeToString(event1);
+        assertEquals(ACCELEROMETER_EVENT_SIMPLE, serialized);
+    }
+
+    @Test
+    public void serializeTwoAccelerometerEventsSimply() {
+        String serialized = AccelerometerEventSerializer.serializeToString(event2, event1);
+        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, serialized);
+    }
+
+    @Test
+    public void serializeTwoAccelerometerEventsSimply2() {
+        String serialized = AccelerometerEventSerializer.serializeToString(Lists.newArrayList(event2, event1));
+        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, serialized);
+    }
 }
