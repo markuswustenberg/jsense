@@ -3,7 +3,7 @@ version '0.1.0-SNAPSHOT'
 dependencies {
     compile project(':jsense-core')
 
-    compile 'com.google.guava:guava:16.0.1'
+    compile 'com.google.guava:guava:17.0'
     compile 'com.google.code.gson:gson:2.2.4'
     compile 'joda-time:joda-time:2.3'
 

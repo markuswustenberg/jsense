@@ -1,7 +1,7 @@
 version '0.1.0-SNAPSHOT'
 
 dependencies {
-    compile 'com.google.guava:guava:16.0.1'
+    compile 'com.google.guava:guava:17.0'
     compile 'joda-time:joda-time:2.3'
 
     testCompile 'junit:junit:4.+'
