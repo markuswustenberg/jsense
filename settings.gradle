@@ -1,3 +1,3 @@
-include ':jsense'
+include ':jsense-core'
 include ':jsense-json'
 include ':jsense-protobuf'

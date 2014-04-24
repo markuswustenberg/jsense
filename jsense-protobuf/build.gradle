@@ -26,12 +26,12 @@ tasks.withType(Pmd) {
 }
 
 dependencies {
-    compile project(':jsense')
+    compile project(':jsense-core')
 
     compile 'com.google.guava:guava:16.0.1'
     compile 'com.google.protobuf:protobuf-java:2.5.0'
     compile 'joda-time:joda-time:2.3'
 
     testCompile 'junit:junit:4.+'
-    testCompile project(':jsense').sourceSets.test.output
+    testCompile project(':jsense-core').sourceSets.test.output
 }
