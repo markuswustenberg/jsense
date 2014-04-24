@@ -1,17 +1,19 @@
 buildscript {
     repositories {
         mavenCentral()
+        jcenter()
     }
 
     dependencies {
         classpath 'net.saliman:gradle-cobertura-plugin:2.0.0' // cobertura plugin
         classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
+        classpath 'org.gradle.api.plugins:gradle-nexus-plugin:0.6.1'
     }
 }
 
 subprojects {
     apply plugin: 'java'
-    apply plugin: 'maven-publish'
+    apply plugin: 'nexus'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
@@ -20,7 +22,6 @@ subprojects {
     apply plugin: 'coveralls'
 
     group 'org.jsense'
-    status 'release'
 
     sourceCompatibility = JavaVersion.VERSION_1_6
     targetCompatibility = JavaVersion.VERSION_1_6
@@ -43,74 +44,30 @@ subprojects {
 
     cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 
-    task sourceJar(type: Jar) {
-        from sourceSets.main.allJava
-    }
-
-    task javadocJar(type: Jar, dependsOn: javadoc) {
-        from javadoc.destinationDir
-    }
-
-    publishing {
-        publications {
-            java(MavenPublication) {
-                from components.java
-                artifact sourceJar {
-                    classifier "sources"
-                }
-                artifact javadocJar {
-                    classifier "javadoc"
-                }
-                pom.withXml {
-                    // The fourth child element is "version", this could probably be improved
-                    asNode().children().get(3) + {
-                        // The following line is so that the nested closure works
-                        resolveStrategy = Closure.DELEGATE_FIRST
-                        packaging 'jar'
-                        name project.group + ':' + project.name
-                        description 'A Java library to work with sensing. Because sensing is nice.'
-                        url 'http://www.jsense.org'
-                        licenses {
-                            license {
-                                name 'MIT License'
-                                url 'http://opensource.org/licenses/MIT'
-                                distribution 'repo'
-                            }
-                        }
-                        scm {
-                            url 'https://github.com/markuswustenberg/jsense'
-                            connection 'scm:git:git://github.com/markuswustenberg/jsense.git'
-                            developerConnection 'scm:git:ssh:git@github.com:markuswustenberg/jsense.git'
-
-                        }
-                        developers {
-                            developer {
-                                id 'markuswustenberg'
-                                name 'Markus Wüstenberg'
-                                email 'markus@wustenberg.dk'
-                            }
-                        }
-                    }
+    modifyPom {
+        project {
+            name project.group + ':' + project.name
+            description project.description
+            url 'http://www.jsense.org'
+            packaging 'jar'
+            licenses {
+                license {
+                    name 'MIT License'
+                    url 'http://opensource.org/licenses/MIT'
+                    distribution 'repo'
                 }
             }
-        }
-        if (hasProperty('sonatypeUsername') && hasProperty('sonatypePassword')) {
-            repositories {
-                maven {
-                    name 'snapshot'
-                    url 'https://oss.sonatype.org/content/repositories/snapshots'
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
-                }
-                maven {
-                    name 'release'
-                    url 'https://oss.sonatype.org/service/local/staging/deploy/maven2'
-                    credentials {
-                        username = sonatypeUsername
-                        password = sonatypePassword
-                    }
+            scm {
+                url 'https://github.com/markuswustenberg/jsense'
+                connection 'scm:git:git://github.com/markuswustenberg/jsense.git'
+                developerConnection 'scm:git:ssh:git@github.com:markuswustenberg/jsense.git'
+
+            }
+            developers {
+                developer {
+                    id 'markuswustenberg'
+                    name 'Markus Wüstenberg'
+                    email 'markus@wustenberg.dk'
                 }
             }
         }
