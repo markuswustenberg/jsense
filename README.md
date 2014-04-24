@@ -4,6 +4,7 @@ jsense is a Java library to work with sensing. Because sensing is nice.
 
 [![Build Status](https://travis-ci.org/markuswustenberg/jsense.png?branch=master)](https://travis-ci.org/markuswustenberg/jsense)
 [![Gitter chat](https://badges.gitter.im/markuswustenberg/jsense.png)](https://gitter.im/markuswustenberg/jsense)
+[![Coverage Status](https://coveralls.io/repos/markuswustenberg/jsense/badge.png?branch=master)](https://coveralls.io/r/markuswustenberg/jsense?branch=master)
 
 ## Project goals
 

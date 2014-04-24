@@ -1,9 +1,23 @@
+buildscript {
+    repositories {
+        mavenCentral()
+    }
+
+    dependencies {
+        classpath 'net.saliman:gradle-cobertura-plugin:2.0.0' // cobertura plugin
+        classpath 'org.kt3k.gradle.plugin:coveralls-gradle-plugin:0.4.0'
+    }
+}
+
 subprojects {
     apply plugin: 'java'
     apply plugin: 'maven-publish'
     apply plugin: 'findbugs'
     apply plugin: 'checkstyle'
     apply plugin: 'pmd'
+
+    apply plugin: 'cobertura'
+    apply plugin: 'coveralls'
 
     group 'org.jsense'
     status 'release'
@@ -26,6 +40,8 @@ subprojects {
         configFile = new File(rootDir, 'config/checkstyle/checkstyle.xml')
         showViolations = false
     }
+
+    cobertura.coverageFormats = ['html', 'xml'] // coveralls plugin depends on xml format report
 
     task sourceJar(type: Jar) {
         from sourceSets.main.allJava
