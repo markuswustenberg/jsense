@@ -12,6 +12,7 @@ The goal of jsense is to provide libraries that support common uses of sensing d
 - Basic data handling: Providing a common model for handling sensor data across platforms, saving and loading data in various formats, converting between formats.
 - Data processing: Preparing for activity recognition (with feature selection and computation, machine learning, gesture recognition).
 - Generally, to make common tasks easy to undertake.
+- Provide all of this under [a very liberal open source license](https://github.com/markuswustenberg/jsense/blob/master/LICENSE) (the MIT license).
 
 ## Project values
 
