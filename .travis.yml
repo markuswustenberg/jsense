@@ -3,6 +3,9 @@ language: java
 notifications:
   irc: "chat.freenode.net#jsense"
   email: false
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/8207a99e7ca3ea616ffe
 
 env:
   - TERM=dumb
