@@ -1,6 +1,6 @@
 apply plugin: 'protobuf'
 
-version '0.1.0'
+version '0.1.0-SNAPSHOT'
 
 buildscript {
     repositories {

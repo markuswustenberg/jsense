@@ -1,4 +1,4 @@
-version '0.1.0'
+version '0.1.0-SNAPSHOT'
 
 dependencies {
     compile 'com.google.guava:guava:16.0.1'
