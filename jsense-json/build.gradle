@@ -1,4 +1,5 @@
-version '0.1.0-SNAPSHOT'
+version '0.2.0-SNAPSHOT'
+description 'A Java library to work with sensing. Because sensing is nice. This is a supplemental library to allow serialization and deserialization to/from JSON.'
 
 dependencies {
     compile project(':jsense-core')

@@ -1,4 +1,5 @@
-version '0.1.0'
+version '0.2.0-SNAPSHOT'
+description 'A Java library to work with sensing. Because sensing is nice. This is the core library.'
 
 dependencies {
     compile 'com.google.guava:guava:17.0'
