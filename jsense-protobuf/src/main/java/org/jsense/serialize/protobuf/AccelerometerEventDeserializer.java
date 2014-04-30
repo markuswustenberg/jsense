@@ -3,6 +3,7 @@ package org.jsense.serialize.protobuf;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteSource;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Deserializer;
@@ -13,22 +14,41 @@ import java.io.InputStream;
 import java.util.List;
 
 /**
- * A {@link org.jsense.serialize.Deserializer} that deserializes {@link org.jsense.AccelerometerEvent}s from
- * Protocol Buffers format.
- *
+ * A {@link org.jsense.serialize.Deserializer} that deserializes {@link org.jsense.AccelerometerEvent}s from Protocol Buffers format.
+ * <p/>
  * Currently loads all data into memory.
+ * <p/>
+ * This class is thread-safe.
  *
+ * @see org.jsense.serialize.protobuf.AccelerometerEventSerializer
  * @author Markus Wüstenberg
  */
 @Beta
 public final class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
+
+    private static final String CLOSED_EXCEPTION_MESSAGE = "The Deserializer is closed, no deserializing possible.";
+
+    private final ByteSource source;
+    private InputStream in;
+    private boolean closed;
+
+    public AccelerometerEventDeserializer(ByteSource source) {
+        this.source = Preconditions.checkNotNull(source);
+    }
+
     @Override
-    public Iterable<AccelerometerEvent> from(InputStream in) throws IOException {
-        Preconditions.checkNotNull(in);
+    public synchronized Iterable<AccelerometerEvent> deserialize() throws IOException {
+        if (closed) {
+            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+        }
+
+        if (in == null) {
+            openSource();
+        }
 
         ProtoModel.ThreeAxisSensorEvent proto;
         AccelerometerEvent.Builder builder = AccelerometerEvent.newBuilder();
-        List<AccelerometerEvent> events = Lists.newLinkedList();
+        List<AccelerometerEvent> events = Lists.newArrayList();
         while ((proto = ProtoModel.ThreeAxisSensorEvent.parseDelimitedFrom(in)) != null) {
             builder.setAbsoluteTimestamp(new Instant(proto.getAbsoluteTimestamp()))
                     .setX(proto.getX())
@@ -41,5 +61,17 @@ public final class AccelerometerEventDeserializer implements Deserializer<Accele
             builder.reset();
         }
         return events;
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        closed = true;
+        if (in != null) {
+            in.close();
+        }
+    }
+
+    private void openSource() throws IOException {
+        in = source.openBufferedStream();
     }
 }
