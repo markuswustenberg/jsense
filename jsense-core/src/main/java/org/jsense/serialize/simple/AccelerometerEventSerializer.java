@@ -75,6 +75,10 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
 
     @Override
     public synchronized void flush() throws IOException {
+        if (closed) {
+            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+        }
+
         if (writer != null) {
             writer.flush();
         }
@@ -82,10 +86,10 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
 
     @Override
     public synchronized void close() throws IOException {
-        closed = true;
-        if (writer != null) {
+        if (!closed && writer != null) {
             writer.close();
         }
+        closed = true;
     }
 
     private void openSink() throws IOException {

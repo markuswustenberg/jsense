@@ -101,6 +101,12 @@ public class TestSimpleSerialization {
         serializer.serialize(Lists.newArrayList(event1));
     }
 
+    @Test(expected = IOException.class)
+    public void cantFlushAfterClose() throws IOException {
+        serializer.close();
+        serializer.flush();
+    }
+
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
         Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
