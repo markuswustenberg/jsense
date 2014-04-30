@@ -2,6 +2,7 @@ package org.jsense.serialize.protobuf;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.ByteSink;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
 import org.jsense.serialize.Serializer;
@@ -12,12 +13,13 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Tests for the AccelerometerEventProtocolBuffersSerializer.
+ * Tests for the {@link org.jsense.serialize.protobuf.AccelerometerEventSerializer}.
  *
  * @author Markus Wüstenberg
  */
@@ -37,8 +39,12 @@ public class TestProtocolBuffersSerializers {
     @Before
     public void setUp() {
         out = new ByteArrayOutputStream();
-
-        serializer = new AccelerometerEventSerializer();
+        serializer = new AccelerometerEventSerializer(new ByteSink() {
+            @Override
+            public OutputStream openStream() throws IOException {
+                return out;
+            }
+        });
 
         ModelFactory.setSeed(SEED);
         event1 = ModelFactory.newRandomAccelerometerEvent();
@@ -47,8 +53,8 @@ public class TestProtocolBuffersSerializers {
 
     @Test
     public void serializeSingleAccelerometerEvent() throws IOException {
-        serializer.serialize(ImmutableList.of(event1))
-                .to(out);
+        serializer.serialize(ImmutableList.of(event1));
+        serializer.flush();
         in = new ByteArrayInputStream(out.toByteArray());
         ProtoModel.ThreeAxisSensorEvent parsedEvent = ProtoModel.ThreeAxisSensorEvent.parseDelimitedFrom(in);
         validateEvent(event1, parsedEvent);
@@ -56,8 +62,8 @@ public class TestProtocolBuffersSerializers {
 
     @Test
     public void serializeTwoAccelerometerEvents() throws IOException {
-        serializer.serialize(ImmutableList.of(event1, event2))
-                .to(out);
+        serializer.serialize(ImmutableList.of(event1, event2));
+        serializer.flush();
         in = new ByteArrayInputStream(out.toByteArray());
         ProtoModel.ThreeAxisSensorEvent parsedEvent = ProtoModel.ThreeAxisSensorEvent.parseDelimitedFrom(in);
         validateEvent(event1, parsedEvent);
@@ -78,24 +84,40 @@ public class TestProtocolBuffersSerializers {
     }
 
     @Test(expected = NullPointerException.class)
-    public void serializeValueCantBeNull() {
-        serializer.serialize(null);
+    public void serializeValueCantBeNull() throws IOException {
+        serializer.serialize((AccelerometerEvent) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void outputStreamCantBeNull() throws IOException {
-        serializer.serialize(ImmutableList.of(event1))
-                .to(null);
+    public void serializeValuesCantBeNull() throws IOException {
+        serializer.serialize((Iterable<AccelerometerEvent>) null);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void serializerMustHaveData() throws IOException {
-        serializer.to(out);
+    @Test(expected = NullPointerException.class)
+    public void sinkCantBeNull() throws IOException {
+        new AccelerometerEventSerializer(null);
     }
 
     @Test(expected = IllegalStateException.class)
     public void serializerMustHaveNonEmptyData() throws IOException {
-        serializer.serialize(Lists.<AccelerometerEvent>newArrayList())
-                .to(out);
+        serializer.serialize(Lists.<AccelerometerEvent>newArrayList());
+    }
+
+    @Test(expected = IOException.class)
+    public void cantWriteAfterClose() throws IOException {
+        serializer.close();
+        serializer.serialize(event1);
+    }
+
+    @Test(expected = IOException.class)
+    public void cantWriteAfterClose2() throws IOException {
+        serializer.close();
+        serializer.serialize(Lists.newArrayList(event1));
+    }
+
+    @Test(expected = IOException.class)
+    public void cantFlushAfterClose() throws IOException {
+        serializer.close();
+        serializer.flush();
     }
 }

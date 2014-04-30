@@ -1,26 +1,25 @@
 package org.jsense.serialize.simple;
 
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSource;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Deserializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.util.List;
 
 /**
- * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of
- * {@link org.jsense.AccelerometerEvent}s.
+ * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
  * <p/>
  * Currently loads all events into memory.
  * <p/>
  * This class is thread-safe.
  *
+ * @see org.jsense.serialize.simple.AccelerometerEventSerializer
  * @author Markus Wüstenberg
  */
 public final class AccelerometerEventDeserializer implements Deserializer<AccelerometerEvent> {
@@ -34,27 +33,54 @@ public final class AccelerometerEventDeserializer implements Deserializer<Accele
     private static final int Y_INDEX = 4;
     private static final int Z_INDEX = 5;
 
-    @Override
-    public Iterable<AccelerometerEvent> from(InputStream in) throws IOException {
-        Preconditions.checkNotNull(in);
+    private static final String CLOSED_EXCEPTION_MESSAGE = "The Deserializer is closed, no deserializing possible.";
 
-        BufferedReader reader = new BufferedReader(new InputStreamReader(in, Charsets.UTF_8));
+    private final CharSource source;
+    private BufferedReader reader;
+    private boolean closed;
+
+    public AccelerometerEventDeserializer(CharSource source) {
+        this.source = Preconditions.checkNotNull(source);
+    }
+
+    @Override
+    public synchronized Iterable<AccelerometerEvent> deserialize() throws IOException {
+        if (closed) {
+            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+        }
+
+        if (reader == null) {
+            openSource();
+        }
+
         String line;
         List<AccelerometerEvent> events = Lists.newArrayList();
         while ((line = reader.readLine()) != null) {
-            String[] parts = line.split(STANDARD_DELIMITER);
+            List<String> parts = Splitter.on(STANDARD_DELIMITER).splitToList(line);
             AccelerometerEvent.Builder builder = AccelerometerEvent.newBuilder();
             builder
-                    .setAbsoluteTimestamp(new Instant(Long.parseLong(parts[ABSOLUTE_TIMESTAMP_INDEX])))
-                    .setX(Float.parseFloat(parts[X_INDEX]))
-                    .setY(Float.parseFloat(parts[Y_INDEX]))
-                    .setZ(Float.parseFloat(parts[Z_INDEX]));
-            if (Boolean.parseBoolean(parts[HAS_RELATIVE_TIMESTAMP_INDEX])) {
-                builder.setRelativeTimestamp(Long.parseLong(parts[RELATIVE_TIMESTAMP_INDEX]));
+                    .setAbsoluteTimestamp(new Instant(Long.parseLong(parts.get(ABSOLUTE_TIMESTAMP_INDEX))))
+                    .setX(Float.parseFloat(parts.get(X_INDEX)))
+                    .setY(Float.parseFloat(parts.get(Y_INDEX)))
+                    .setZ(Float.parseFloat(parts.get(Z_INDEX)));
+            if (Boolean.parseBoolean(parts.get(HAS_RELATIVE_TIMESTAMP_INDEX))) {
+                builder.setRelativeTimestamp(Long.parseLong(parts.get(RELATIVE_TIMESTAMP_INDEX)));
             }
             events.add(builder.build());
         }
 
         return events;
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        closed = true;
+        if (reader != null) {
+            reader.close();
+        }
+    }
+
+    private void openSource() throws IOException {
+        reader = source.openBufferedStream();
     }
 }

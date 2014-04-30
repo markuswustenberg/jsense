@@ -27,7 +27,6 @@ The goal of jsense is to provide libraries that support common uses of sensing d
 jsense has several components:
 
 - `jsense-core` contains the core classes, such as the model (`AccelerometerEvent` etc.), the `Serializer` and `Deserializer` interfaces and basic implementations of these, as well as classes for basic data processing.
-- `jsense-json` contains classes for converting the model classes to/from JSON.
 - `jsense-protobuf` is for converting the model classes to/from [Google Protocol Buffers](https://developers.google.com/protocol-buffers/) format.
 - `jsense-tools` will [soon](https://github.com/markuswustenberg/jsense/issues/26) contain convenience tools for handling data.
 
@@ -38,7 +37,6 @@ jsense depends on a few libraries, depending on which components are loaded. The
 - [Google Guava](https://code.google.com/p/guava-libraries/): A really well-designed library for all kinds of common code, as well as some nice collection classes.
 - [Joda-Time](http://www.joda.org/joda-time/): Because working with time is notoriously hard, and this library makes it much easier. Time is inherent in sensing data, so it makes sense to include a library like this.
 
-For `jsense-json` respectively `jsense-protobuf` only:
+For `jsense-protobuf` only:
 
-- [Gson](https://code.google.com/p/google-gson/): A nice little and easy-to-use JSON serialization/deserialization library.
 - [Google Protocol Buffers](https://developers.google.com/protocol-buffers/): Converting from/to a very efficient binary format.
