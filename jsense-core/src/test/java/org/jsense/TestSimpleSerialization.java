@@ -41,14 +41,12 @@ public class TestSimpleSerialization {
     @Before
     public void setUp() {
         writer = new StringWriter();
-        CharSink sink = new CharSink() {
+        serializer = new AccelerometerEventSerializer(new CharSink() {
             @Override
             public Writer openStream() throws IOException {
                 return writer;
             }
-        };
-
-        serializer = new AccelerometerEventSerializer(sink);
+        });
 
         ModelFactory.setSeed(SEED);
         event1 = ModelFactory.newRandomAccelerometerEvent();
