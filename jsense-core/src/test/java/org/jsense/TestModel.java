@@ -108,4 +108,16 @@ public class TestModel {
                 .build();
         event.getRelativeTimestamp();
     }
+
+    @Test(expected = IllegalStateException.class)
+    public void testBuilderResetMethod() {
+        AccelerometerEvent.newBuilder()
+                .setAbsoluteTimestamp(NOW)
+                .setRelativeTimestamp(UPTIME.getMillis())
+                .setX(X)
+                .setY(Y)
+                .setZ(Z)
+                .reset()
+                .build();
+    }
 }

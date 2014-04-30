@@ -160,6 +160,9 @@ public final class AccelerometerEvent {
 
     /**
      * A {@code Builder} for the {@link AccelerometerEvent}.
+     * <p/>
+     * A {@code Builder} can be used multiple times by calling the {@link #build()} method repeatedly. The {@link #reset()} method can be used to reset the {@code Builder}
+     * to the inital state.
      */
     public static final class Builder {
 
@@ -196,6 +199,21 @@ public final class AccelerometerEvent {
         public Builder setZ(float z) {
             this.z = z;
             hasZ = true;
+            return this;
+        }
+
+        public Builder reset() {
+            absoluteTimestamp = null;
+            relativeTimestamp = 0;
+            x = 0;
+            y = 0;
+            z = 0;
+            hasAbsoluteTimestamp = false;
+            hasRelativeTimestamp = false;
+            hasX = false;
+            hasY = false;
+            hasZ = false;
+
             return this;
         }
 
