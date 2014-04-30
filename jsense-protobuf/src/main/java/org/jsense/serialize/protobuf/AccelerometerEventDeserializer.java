@@ -38,6 +38,7 @@ public final class AccelerometerEventDeserializer implements Deserializer<Accele
                 builder.setRelativeTimestamp(proto.getRelativeTimestamp());
             }
             events.add(builder.build());
+            builder.reset();
         }
         return events;
     }
