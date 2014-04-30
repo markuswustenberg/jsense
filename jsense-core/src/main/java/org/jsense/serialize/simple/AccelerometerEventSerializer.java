@@ -1,93 +1,103 @@
 package org.jsense.serialize.simple;
 
 import com.google.common.annotations.Beta;
-import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.collect.Lists;
+import com.google.common.io.CharSink;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.Serializer;
 
-import java.io.*;
-import java.util.Arrays;
+import java.io.IOException;
+import java.io.Writer;
 
 /**
- * A simple {@link org.jsense.serialize.Serializer} that creates a simple delimited representation of
- * {@link org.jsense.AccelerometerEvent}s.
+ * A simple {@link org.jsense.serialize.Serializer} that creates a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
  * <p/>
- * A newline character (\n) is always used between multiple events, so the line separator as defined by the
- * system property <tt>line.separator</tt> is NOT used.
+ * A newline character (\n) is always used between multiple events, so the line separator as defined by the system property <tt>line.separator</tt> is NOT used.
  * <p/>
- * This class is not thread-safe.
+ * This class is thread-safe.
  *
+ * @see org.jsense.serialize.simple.AccelerometerEventDeserializer
  * @author Markus Wüstenberg
  */
 @Beta
 public final class AccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
 
     private static final String STANDARD_DELIMITER = ",";
+    private static final String LINE_SEPARATOR = "\n";
 
-    private static final AccelerometerEventSerializer singleton = new AccelerometerEventSerializer();
+    private static final String CLOSED_EXCEPTION_MESSAGE = "The Serializer is closed, no serializing possible.";
 
-    private Iterable<AccelerometerEvent> events;
+    private final CharSink sink;
+    private Writer writer;
+    private boolean closed;
+
+    public AccelerometerEventSerializer(CharSink sink) {
+        this.sink = Preconditions.checkNotNull(sink);
+    }
 
     @Override
-    public Serializer<AccelerometerEvent> serialize(Iterable<AccelerometerEvent> events) {
-        this.events = Preconditions.checkNotNull(events);
+    public synchronized Serializer<AccelerometerEvent> serialize(AccelerometerEvent event) throws IOException {
+        Preconditions.checkNotNull(event);
+
+        if (closed) {
+            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+        }
+
+        if (writer == null) {
+            openSink();
+        }
+
+        writeEvent(event);
+
         return this;
     }
 
     @Override
-    public void to(OutputStream out) throws IOException {
-        Preconditions.checkNotNull(out);
-        Preconditions.checkState(events != null);
+    public synchronized Serializer<AccelerometerEvent> serialize(Iterable<AccelerometerEvent> events) throws IOException {
+        Preconditions.checkNotNull(events);
         Preconditions.checkState(!Iterables.isEmpty(events));
 
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(out, Charsets.UTF_8));
+        if (closed) {
+            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+        }
+
+        if (writer == null) {
+            openSink();
+        }
+
         for (AccelerometerEvent event : events) {
-            writer.write(event.getAbsoluteTimestamp().getMillis() + STANDARD_DELIMITER);
-            writer.write(event.hasRelativeTimestamp() + STANDARD_DELIMITER);
-            writer.write(event.getRelativeTimestamp() + STANDARD_DELIMITER);
-            writer.write(event.getX() + STANDARD_DELIMITER);
-            writer.write(event.getY() + STANDARD_DELIMITER);
-            writer.write(event.getZ() + "\n");
+            writeEvent(event);
         }
-        writer.flush();
+
+        return this;
     }
 
-    /**
-     * Serialises an {@link org.jsense.AccelerometerEvent} directly to a {@code String}, using a singleton {@code AccelerometerEventSerializer} internally.
-     *
-     * @param event The event to serialise.
-     * @return The serialised event as a {@code String}.
-     */
-    public static String serializeToString(AccelerometerEvent event) {
-        return serializeToString(Lists.newArrayList(event));
-    }
-
-    /**
-     * Serialises {@link org.jsense.AccelerometerEvent}s directly to a {@code String}, using a singleton {@code AccelerometerEventSerializer} internally.
-     *
-     * @param events The events to serialise.
-     * @return The serialised events as a {@code String}.
-     */
-    public static String serializeToString(AccelerometerEvent... events) {
-        return serializeToString(Arrays.asList(events));
-    }
-
-    /**
-     * Serialises {@link org.jsense.AccelerometerEvent}s directly to a {@code String}, using a singleton {@code AccelerometerEventSerializer} internally.
-     *
-     * @param events The events to serialise.
-     * @return The serialised events as a {@code String}.
-     */
-    public static String serializeToString(Iterable<AccelerometerEvent> events) {
-        try {
-            ByteArrayOutputStream out = new ByteArrayOutputStream();
-            singleton.serialize(events).to(out);
-            return out.toString(Charsets.UTF_8.name());
-        } catch (IOException e) {
-            throw new RuntimeException("Error writing to ByteArrayOutputStream.");
+    @Override
+    public synchronized void flush() throws IOException {
+        if (writer != null) {
+            writer.flush();
         }
+    }
+
+    @Override
+    public synchronized void close() throws IOException {
+        closed = true;
+        if (writer != null) {
+            writer.close();
+        }
+    }
+
+    private void openSink() throws IOException {
+        writer = sink.openBufferedStream();
+    }
+
+    private void writeEvent(AccelerometerEvent event) throws IOException {
+        writer.write(event.getAbsoluteTimestamp().getMillis() + STANDARD_DELIMITER);
+        writer.write(event.hasRelativeTimestamp() + STANDARD_DELIMITER);
+        writer.write(event.getRelativeTimestamp() + STANDARD_DELIMITER);
+        writer.write(event.getX() + STANDARD_DELIMITER);
+        writer.write(event.getY() + STANDARD_DELIMITER);
+        writer.write(event.getZ() + LINE_SEPARATOR);
     }
 }

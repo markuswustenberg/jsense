@@ -1,8 +1,9 @@
 package org.jsense;
 
-import com.google.common.base.Charsets;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
+import com.google.common.io.CharSink;
+import com.google.common.io.CharSource;
 import org.jsense.serialize.Deserializer;
 import org.jsense.serialize.Serializer;
 import org.jsense.serialize.simple.AccelerometerEventDeserializer;
@@ -10,10 +11,9 @@ import org.jsense.serialize.simple.AccelerometerEventSerializer;
 import org.junit.Before;
 import org.junit.Test;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.Writer;
 import java.util.Iterator;
 
 import static org.junit.Assert.assertEquals;
@@ -32,19 +32,23 @@ public class TestSimpleSerialization {
 
     private static final int SEED = 349246;
 
-    private ByteArrayOutputStream out;
+    private StringWriter writer;
 
     private Serializer<AccelerometerEvent> serializer;
-    private Deserializer<AccelerometerEvent> deserializer;
 
     private AccelerometerEvent event1, event2;
 
     @Before
     public void setUp() {
-        out = new ByteArrayOutputStream();
+        writer = new StringWriter();
+        CharSink sink = new CharSink() {
+            @Override
+            public Writer openStream() throws IOException {
+                return writer;
+            }
+        };
 
-        serializer = new AccelerometerEventSerializer();
-        deserializer = new AccelerometerEventDeserializer();
+        serializer = new AccelerometerEventSerializer(sink);
 
         ModelFactory.setSeed(SEED);
         event1 = ModelFactory.newRandomAccelerometerEvent();
@@ -53,44 +57,54 @@ public class TestSimpleSerialization {
 
     @Test
     public void serializeSingleAccelerometerEvent() throws IOException {
-        serializer.serialize(ImmutableList.of(event1))
-                .to(out);
-        assertEquals(ACCELEROMETER_EVENT_SIMPLE, out.toString(Charsets.UTF_8.name()));
+        serializer.serialize(event1);
+        serializer.flush();
+        assertEquals(ACCELEROMETER_EVENT_SIMPLE, writer.toString());
     }
 
     @Test
     public void serializeTwoAccelerometerEvents() throws IOException {
-        serializer.serialize(ImmutableList.of(event2, event1))
-                .to(out);
-        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, out.toString(Charsets.UTF_8.name()));
+        serializer.serialize(ImmutableList.of(event2, event1));
+        serializer.flush();
+        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, writer.toString());
     }
 
     @Test(expected = NullPointerException.class)
-    public void serializeValueCantBeNull() {
-        serializer.serialize(null);
+    public void serializeValueCantBeNull() throws IOException {
+        serializer.serialize((AccelerometerEvent) null);
     }
 
     @Test(expected = NullPointerException.class)
-    public void outputStreamCantBeNull() throws IOException {
-        serializer.serialize(ImmutableList.of(event1))
-                .to(null);
+    public void serializeValuesCantBeNull() throws IOException {
+        serializer.serialize((Iterable<AccelerometerEvent>) null);
     }
 
-    @Test(expected = IllegalStateException.class)
-    public void serializerMustHaveData() throws IOException {
-        serializer.to(out);
+    @Test(expected = NullPointerException.class)
+    public void sinkCantBeNull() throws IOException {
+        new AccelerometerEventSerializer(null);
     }
 
     @Test(expected = IllegalStateException.class)
     public void serializerMustHaveNonEmptyData() throws IOException {
-        serializer.serialize(Lists.<AccelerometerEvent>newArrayList())
-                .to(out);
+        serializer.serialize(Lists.<AccelerometerEvent>newArrayList());
+    }
+
+    @Test(expected = IOException.class)
+    public void cantWriteAfterClose() throws IOException {
+        serializer.close();
+        serializer.serialize(event1);
+    }
+
+    @Test(expected = IOException.class)
+    public void cantWriteAfterClose2() throws IOException {
+        serializer.close();
+        serializer.serialize(Lists.newArrayList(event1));
     }
 
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
-        InputStream in = getInputStreamFrom(ImmutableList.of(event1));
-        Iterable<AccelerometerEvent> events = deserializer.from(in);
+        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
+        Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
         assertTrue(eventsIterator.hasNext());
@@ -99,43 +113,25 @@ public class TestSimpleSerialization {
 
     @Test
     public void deserializeMultipleAccelerometerEvents() throws IOException {
-        InputStream in = getInputStreamFrom(ImmutableList.of(event1, event2));
-        Iterable<AccelerometerEvent> events = deserializer.from(in);
+        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENTS_SIMPLE));
+        Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
         assertTrue(eventsIterator.hasNext());
-        assertEquals(event1, eventsIterator.next());
-        assertTrue(eventsIterator.hasNext());
         assertEquals(event2, eventsIterator.next());
+        assertTrue(eventsIterator.hasNext());
+        assertEquals(event1, eventsIterator.next());
     }
 
     @Test(expected = NullPointerException.class)
-    public void inputStreamCantBeNull() throws IOException {
-        deserializer.from(null);
+    public void sourceCantBeNull() throws IOException {
+        new AccelerometerEventDeserializer(null);
     }
 
-    private InputStream getInputStreamFrom(Iterable<AccelerometerEvent> events) throws IOException {
-        serializer
-                .serialize(events)
-                .to(out);
-        return new ByteArrayInputStream(out.toByteArray());
-    }
-
-    @Test
-    public void serializeSingleAccelerometerEventSimply() {
-        String serialized = AccelerometerEventSerializer.serializeToString(event1);
-        assertEquals(ACCELEROMETER_EVENT_SIMPLE, serialized);
-    }
-
-    @Test
-    public void serializeTwoAccelerometerEventsSimply() {
-        String serialized = AccelerometerEventSerializer.serializeToString(event2, event1);
-        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, serialized);
-    }
-
-    @Test
-    public void serializeTwoAccelerometerEventsSimply2() {
-        String serialized = AccelerometerEventSerializer.serializeToString(Lists.newArrayList(event2, event1));
-        assertEquals(ACCELEROMETER_EVENTS_SIMPLE, serialized);
+    @Test(expected = IOException.class)
+    public void cantDeserializeAfterClose() throws IOException {
+        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
+        deserializer.close();
+        deserializer.deserialize();
     }
 }

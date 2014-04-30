@@ -2,26 +2,28 @@ package org.jsense.serialize;
 
 import com.google.common.annotations.Beta;
 
+import java.io.Closeable;
 import java.io.IOException;
-import java.io.InputStream;
 
 /**
- * A {@code Deserializer} can deserialize data from an {@link java.io.InputStream}.
+ * A {@code Deserializer} can deserialize data. Its interface draws inspiration from {@link java.io.InputStream}.
  * <p/>
- * The implementing classes may or may not be thread-safe.
+ * A {@code Deserializer} must be closed after use.
+ * <p/>
+ * The implementing classes are usually thread-safe.
  *
+ * @see org.jsense.serialize.Serializer
  * @param <T> The type of data to be deserialized.
  * @author Markus Wüstenberg
  */
 @Beta
-public interface Deserializer<T> {
+public interface Deserializer<T> extends Closeable {
 
     /**
-     * Reads serialized data from the {@link java.io.InputStream}.
+     * Deserializes data, preferably lazily, while minimizing loading data into memory. This is implementation-specific.
      *
-     * @param in The {@link java.io.InputStream} to read from.
      * @return An {@link java.lang.Iterable} over {@code T}.
-     * @throws IOException If there is a problem reading from {@code in}.
+     * @throws IOException If there is a problem deserializing. In particular, an {@link java.io.IOException} is thrown if the {@code Deserializer} is closed.
      */
-    Iterable<T> from(InputStream in) throws IOException;
+    Iterable<T> deserialize() throws IOException;
 }
