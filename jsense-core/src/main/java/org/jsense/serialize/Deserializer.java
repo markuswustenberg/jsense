@@ -10,7 +10,7 @@ import java.io.IOException;
  * <p/>
  * A {@code Deserializer} must be closed after use.
  * <p/>
- * The implementing classes are usually thread-safe.
+ * The implementing classes are usually not thread-safe.
  *
  * @see org.jsense.serialize.Serializer
  * @param <T> The type of data to be deserialized.

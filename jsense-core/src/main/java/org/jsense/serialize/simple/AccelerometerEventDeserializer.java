@@ -2,7 +2,7 @@ package org.jsense.serialize.simple;
 
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
-import com.google.common.collect.Lists;
+import com.google.common.collect.AbstractIterator;
 import com.google.common.io.CharSource;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
@@ -10,14 +10,13 @@ import org.jsense.serialize.Deserializer;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
  * <p/>
- * Currently loads all events into memory.
- * <p/>
- * This class is thread-safe.
+ * This class is not thread-safe.
  *
  * @see org.jsense.serialize.simple.AccelerometerEventSerializer
  * @author Markus Wüstenberg
@@ -53,23 +52,12 @@ public final class AccelerometerEventDeserializer implements Deserializer<Accele
             openSource();
         }
 
-        String line;
-        List<AccelerometerEvent> events = Lists.newArrayList();
-        while ((line = reader.readLine()) != null) {
-            List<String> parts = Splitter.on(STANDARD_DELIMITER).splitToList(line);
-            AccelerometerEvent.Builder builder = AccelerometerEvent.newBuilder();
-            builder
-                    .setAbsoluteTimestamp(new Instant(Long.parseLong(parts.get(ABSOLUTE_TIMESTAMP_INDEX))))
-                    .setX(Float.parseFloat(parts.get(X_INDEX)))
-                    .setY(Float.parseFloat(parts.get(Y_INDEX)))
-                    .setZ(Float.parseFloat(parts.get(Z_INDEX)));
-            if (Boolean.parseBoolean(parts.get(HAS_RELATIVE_TIMESTAMP_INDEX))) {
-                builder.setRelativeTimestamp(Long.parseLong(parts.get(RELATIVE_TIMESTAMP_INDEX)));
-            }
-            events.add(builder.build());
+        // This is dirty: exception tunneling. Maybe find a better way at some point.
+        try {
+            return new AccelerometerEventIterable(reader);
+        } catch (IOExceptionWrapper e) {
+            throw e.getIoException();
         }
-
-        return events;
     }
 
     @Override
@@ -82,5 +70,76 @@ public final class AccelerometerEventDeserializer implements Deserializer<Accele
 
     private void openSource() throws IOException {
         reader = source.openBufferedStream();
+    }
+
+    /**
+     * A simple wrapper around {@link java.io.IOException}s that enables tunneling.
+     */
+    private static class IOExceptionWrapper extends RuntimeException {
+
+        private final IOException e;
+
+        public IOExceptionWrapper(IOException e) {
+            this.e = e;
+        }
+
+        public IOException getIoException() {
+            return e;
+        }
+    }
+
+    /**
+     * An {@link java.lang.Iterable} that returns an {@link org.jsense.serialize.simple.AccelerometerEventDeserializer.AccelerometerEventIterator}.
+     */
+    private static class AccelerometerEventIterable implements Iterable<AccelerometerEvent> {
+
+        private final BufferedReader reader;
+
+        public AccelerometerEventIterable(BufferedReader reader) {
+            this.reader = reader;
+        }
+
+        @Override
+        public Iterator<AccelerometerEvent> iterator() {
+            return new AccelerometerEventIterator(reader);
+        }
+    }
+
+    /**
+     * An {@code AccelerometerEventIterator} reads the underlying stream without loading everything into memory.
+     */
+    private static class AccelerometerEventIterator extends AbstractIterator<AccelerometerEvent> {
+
+        private final AccelerometerEvent.Builder builder = AccelerometerEvent.newBuilder();
+        private final BufferedReader reader;
+
+        public AccelerometerEventIterator(BufferedReader reader) {
+            this.reader = reader;
+        }
+
+        @Override
+        protected AccelerometerEvent computeNext() {
+            try {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    List<String> parts = Splitter.on(STANDARD_DELIMITER).splitToList(line);
+                    builder
+                            .setAbsoluteTimestamp(new Instant(Long.parseLong(parts.get(ABSOLUTE_TIMESTAMP_INDEX))))
+                            .setX(Float.parseFloat(parts.get(X_INDEX)))
+                            .setY(Float.parseFloat(parts.get(Y_INDEX)))
+                            .setZ(Float.parseFloat(parts.get(Z_INDEX)));
+                    if (Boolean.parseBoolean(parts.get(HAS_RELATIVE_TIMESTAMP_INDEX))) {
+                        builder.setRelativeTimestamp(Long.parseLong(parts.get(RELATIVE_TIMESTAMP_INDEX)));
+                    }
+                    AccelerometerEvent event = builder.build();
+                    builder.reset();
+                    return event;
+                }
+
+                return endOfData();
+            } catch (IOException e) {
+                throw new IOExceptionWrapper(e);
+            }
+        }
     }
 }
