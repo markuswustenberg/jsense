@@ -15,9 +15,9 @@ import java.util.List;
 
 /**
  * A {@link org.jsense.serialize.Deserializer} that deserializes {@link org.jsense.AccelerometerEvent}s from Protocol Buffers format.
- * <p/>
+ * <p>
  * Currently loads all data into memory.
- * <p/>
+ * <p>
  * This class is not thread-safe.
  *
  * @see org.jsense.serialize.protobuf.AccelerometerEventSerializer

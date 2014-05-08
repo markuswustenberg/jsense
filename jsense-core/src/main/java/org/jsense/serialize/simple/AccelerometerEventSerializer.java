@@ -12,9 +12,9 @@ import java.io.Writer;
 
 /**
  * A simple {@link org.jsense.serialize.Serializer} that creates a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
- * <p/>
+ * <p>
  * A newline character (\n) is always used between multiple events, so the line separator as defined by the system property <tt>line.separator</tt> is NOT used.
- * <p/>
+ * <p>
  * This class is thread-safe.
  *
  * @see org.jsense.serialize.simple.AccelerometerEventDeserializer

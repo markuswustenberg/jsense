@@ -11,11 +11,11 @@ import java.util.NoSuchElementException;
 /**
  * A {@code SampleBasedSlidingWindow} is a sliding window of a fixed size, optionally overlapping, working over
  * an ordered sequence of data.
- * <p/>
+ * <p>
  * The sliding window is lazy, and only loads more data when it is accessed through the iterator.
- * <p/>
+ * <p>
  * The last {@code ImmutableList&lt;E&gt;} returned by the {@code Iterator} may hold less samples than the window size.
- * <p/>
+ * <p>
  * The {@code Iterator} does not support the {@code remove()} method, which throws
  * an {@link UnsupportedOperationException} if called.
  *

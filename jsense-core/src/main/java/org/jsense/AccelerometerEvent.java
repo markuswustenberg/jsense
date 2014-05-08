@@ -9,10 +9,10 @@ import org.joda.time.ReadableInstant;
 /**
  * An {@code AccelerometerEvent} is a sample from a three-axis accelerometer, with an accurate absolute timestamp in
  * milliseconds, and an optional relative timestamp in nanoseconds.
- * <p/>
+ * <p>
  * Sample values are in m/s^2. The absolute timestamp is often for synchronising with other samples, and the relative
  * timestamp is for comparing with samples from the same dataset with higher precision.
- * <p/>
+ * <p>
  * This class is thread-safe and immutable.
  *
  * @author Markus Wüstenberg
@@ -160,7 +160,7 @@ public final class AccelerometerEvent {
 
     /**
      * A {@code Builder} for the {@link AccelerometerEvent}.
-     * <p/>
+     * <p>
      * A {@code Builder} can be used multiple times by calling the {@link #build()} method repeatedly. The {@link #reset()} method can be used to reset the {@code Builder}
      * to the inital state.
      */

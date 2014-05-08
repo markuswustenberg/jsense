@@ -30,6 +30,10 @@ subprojects {
         mavenCentral()
     }
 
+    javadoc {
+        exclude '**/gen/**'
+    }
+
     tasks.withType(FindBugs) {
         reports {
             xml.enabled = false

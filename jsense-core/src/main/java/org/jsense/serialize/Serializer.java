@@ -8,9 +8,9 @@ import java.io.IOException;
 
 /**
  * A {@code Serializer} can serialize data. Its interface draws inspiration from {@link java.io.OutputStream}.
- * <p/>
+ * <p>
  * Depending on the implementation, the data may be buffered before writing, but may always be flushed explicitly. A {@code Serializer} must be closed after use.
- * <p/>
+ * <p>
  * The implementing classes are usually thread-safe.
  *
  * @see org.jsense.serialize.Deserializer

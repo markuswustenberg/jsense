@@ -13,7 +13,7 @@ import java.io.OutputStream;
 
 /**
  * A {@link org.jsense.serialize.Serializer} that serializes {@link org.jsense.AccelerometerEvent}s into Protocol Buffers format.
- * <p/>
+ * <p>
  * This class is thread-safe.
  *
  * @see org.jsense.serialize.protobuf.AccelerometerEventDeserializer

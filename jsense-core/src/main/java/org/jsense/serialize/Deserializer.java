@@ -7,9 +7,9 @@ import java.io.IOException;
 
 /**
  * A {@code Deserializer} can deserialize data. Its interface draws inspiration from {@link java.io.InputStream}.
- * <p/>
+ * <p>
  * A {@code Deserializer} must be closed after use.
- * <p/>
+ * <p>
  * The implementing classes are usually not thread-safe.
  *
  * @see org.jsense.serialize.Serializer
