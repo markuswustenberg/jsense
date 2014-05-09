@@ -12,7 +12,7 @@ buildscript {
     }
 }
 
-def excludePattern = '/org/jsense/serialize/protobuf/gen/'
+def excludePattern = '/org/jsense/serialize/gen/'
 def excludePatternAntStyle = '**' + excludePattern + '*'
 tasks.withType(FindBugs) {
     classes = classes.filter {

@@ -1,13 +1,11 @@
-package org.jsense;
+package org.jsense.serialize;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.CharSink;
 import com.google.common.io.CharSource;
-import org.jsense.serialize.Deserializer;
-import org.jsense.serialize.Serializer;
-import org.jsense.serialize.simple.AccelerometerEventDeserializer;
-import org.jsense.serialize.simple.AccelerometerEventSerializer;
+import org.jsense.AccelerometerEvent;
+import org.jsense.ModelFactory;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 /**
- * Tests for the {@link org.jsense.serialize.simple.AccelerometerEventSerializer} and {@link org.jsense.serialize.simple.AccelerometerEventDeserializer}.
+ * Tests for the {@link org.jsense.serialize.SimpleAccelerometerEventSerializer} and {@link org.jsense.serialize.SimpleAccelerometerEventDeserializer}.
  *
  * @author Markus Wüstenberg
  */
@@ -41,7 +39,7 @@ public class TestSimpleSerialization {
     @Before
     public void setUp() {
         writer = new StringWriter();
-        serializer = new AccelerometerEventSerializer(new CharSink() {
+        serializer = new SimpleAccelerometerEventSerializer(new CharSink() {
             @Override
             public Writer openStream() throws IOException {
                 return writer;
@@ -79,7 +77,7 @@ public class TestSimpleSerialization {
 
     @Test(expected = NullPointerException.class)
     public void sinkCantBeNull() throws IOException {
-        new AccelerometerEventSerializer(null);
+        new SimpleAccelerometerEventSerializer(null);
     }
 
     @Test(expected = IllegalStateException.class)
@@ -107,7 +105,7 @@ public class TestSimpleSerialization {
 
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
-        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
+        Deserializer<AccelerometerEvent> deserializer = new SimpleAccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -117,7 +115,7 @@ public class TestSimpleSerialization {
 
     @Test
     public void deserializeMultipleAccelerometerEvents() throws IOException {
-        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENTS_SIMPLE));
+        Deserializer<AccelerometerEvent> deserializer = new SimpleAccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENTS_SIMPLE));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -129,12 +127,12 @@ public class TestSimpleSerialization {
 
     @Test(expected = NullPointerException.class)
     public void sourceCantBeNull() throws IOException {
-        new AccelerometerEventDeserializer(null);
+        new SimpleAccelerometerEventDeserializer(null);
     }
 
     @Test(expected = IOException.class)
     public void cantDeserializeAfterClose() throws IOException {
-        Deserializer<AccelerometerEvent> deserializer = new AccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
+        Deserializer<AccelerometerEvent> deserializer = new SimpleAccelerometerEventDeserializer(CharSource.wrap(ACCELEROMETER_EVENT_SIMPLE));
         deserializer.close();
         deserializer.deserialize();
     }

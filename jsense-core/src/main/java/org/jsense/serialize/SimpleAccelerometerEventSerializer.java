@@ -1,36 +1,37 @@
-package org.jsense.serialize.protobuf;
+package org.jsense.serialize;
 
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteSink;
+import com.google.common.io.CharSink;
 import org.jsense.AccelerometerEvent;
-import org.jsense.serialize.Serializer;
-import org.jsense.serialize.protobuf.gen.ProtoModel;
 
 import java.io.IOException;
-import java.io.OutputStream;
+import java.io.Writer;
 
 /**
- * A {@link org.jsense.serialize.Serializer} that serializes {@link org.jsense.AccelerometerEvent}s into Protocol Buffers format.
+ * A simple {@link org.jsense.serialize.Serializer} that creates a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
+ * <p>
+ * A newline character (\n) is always used between multiple events, so the line separator as defined by the system property <tt>line.separator</tt> is NOT used.
  * <p>
  * This class is thread-safe.
  *
- * @see org.jsense.serialize.protobuf.AccelerometerEventDeserializer
+ * @see org.jsense.serialize.SimpleAccelerometerEventDeserializer
  * @author Markus Wüstenberg
  */
 @Beta
-public final class AccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
+public final class SimpleAccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
+
+    private static final String STANDARD_DELIMITER = ",";
+    private static final String LINE_SEPARATOR = "\n";
 
     private static final String CLOSED_EXCEPTION_MESSAGE = "The Serializer is closed, no serializing possible.";
 
-    private final ByteSink sink;
-    private OutputStream out;
+    private final CharSink sink;
+    private Writer writer;
     private boolean closed;
 
-    private ProtoModel.ThreeAxisSensorEvent.Builder builder = ProtoModel.ThreeAxisSensorEvent.newBuilder();
-
-    public AccelerometerEventSerializer(ByteSink sink) {
+    public SimpleAccelerometerEventSerializer(CharSink sink) {
         this.sink = Preconditions.checkNotNull(sink);
     }
 
@@ -42,7 +43,7 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
             throw new IOException(CLOSED_EXCEPTION_MESSAGE);
         }
 
-        if (out == null) {
+        if (writer == null) {
             openSink();
         }
 
@@ -60,7 +61,7 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
             throw new IOException(CLOSED_EXCEPTION_MESSAGE);
         }
 
-        if (out == null) {
+        if (writer == null) {
             openSink();
         }
 
@@ -77,33 +78,29 @@ public final class AccelerometerEventSerializer implements Serializer<Accelerome
             throw new IOException(CLOSED_EXCEPTION_MESSAGE);
         }
 
-        if (out != null) {
-            out.flush();
+        if (writer != null) {
+            writer.flush();
         }
     }
 
     @Override
     public synchronized void close() throws IOException {
-        if (!closed && out != null) {
-            out.close();
+        if (!closed && writer != null) {
+            writer.close();
         }
         closed = true;
     }
 
     private void openSink() throws IOException {
-        out = sink.openBufferedStream();
+        writer = sink.openBufferedStream();
     }
 
     private void writeEvent(AccelerometerEvent event) throws IOException {
-        builder.setAbsoluteTimestamp(event.getAbsoluteTimestamp().getMillis())
-                .setX(event.getX())
-                .setY(event.getY())
-                .setZ(event.getZ());
-        if (event.hasRelativeTimestamp()) {
-            builder.setRelativeTimestamp(event.getRelativeTimestamp());
-        }
-        ProtoModel.ThreeAxisSensorEvent proto = builder.build();
-        builder.clear();
-        proto.writeDelimitedTo(out);
+        writer.write(event.getAbsoluteTimestamp().getMillis() + STANDARD_DELIMITER);
+        writer.write(event.hasRelativeTimestamp() + STANDARD_DELIMITER);
+        writer.write(event.getRelativeTimestamp() + STANDARD_DELIMITER);
+        writer.write(event.getX() + STANDARD_DELIMITER);
+        writer.write(event.getY() + STANDARD_DELIMITER);
+        writer.write(event.getZ() + LINE_SEPARATOR);
     }
 }

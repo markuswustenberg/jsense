@@ -1,4 +1,4 @@
-package org.jsense.serialize.protobuf;
+package org.jsense.serialize;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.io.ByteSink;
@@ -18,7 +18,7 @@ import java.util.Iterator;
 import static org.junit.Assert.*;
 
 /**
- * Tests the {@link org.jsense.serialize.protobuf.AccelerometerEventDeserializer}.
+ * Tests the {@link org.jsense.serialize.PbAccelerometerEventDeserializer}.
  *
  * @author Markus Wüstenberg
  */
@@ -42,7 +42,7 @@ public class TestProtocolBuffersDeserializers {
 
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
-        AccelerometerEventDeserializer deserializer = new AccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1))));
+        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1))));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -52,7 +52,7 @@ public class TestProtocolBuffersDeserializers {
 
     @Test
     public void deserializeMultipleAccelerometerEvents() throws IOException {
-        AccelerometerEventDeserializer deserializer = new AccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1, event2))));
+        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1, event2))));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -64,7 +64,7 @@ public class TestProtocolBuffersDeserializers {
 
     @Test(expected = NullPointerException.class)
     public void sourceCantBeNull() throws IOException {
-        new AccelerometerEventDeserializer(null);
+        new PbAccelerometerEventDeserializer(null);
     }
 
     @Test
@@ -85,7 +85,7 @@ public class TestProtocolBuffersDeserializers {
                 .build();
 
         ByteSource serialized = ByteSource.wrap(getByteArrayFrom(ImmutableList.of(eventWithRelativeTimestamp, eventNoRelativeTimestamp)));
-        AccelerometerEventDeserializer deserializer = new AccelerometerEventDeserializer(serialized);
+        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(serialized);
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
 
@@ -95,7 +95,7 @@ public class TestProtocolBuffersDeserializers {
 
     private byte[] getByteArrayFrom(Iterable<AccelerometerEvent> events) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new AccelerometerEventSerializer(new ByteSink() {
+        new PbAccelerometerEventSerializer(new ByteSink() {
             @Override
             public OutputStream openStream() throws IOException {
                 return out;

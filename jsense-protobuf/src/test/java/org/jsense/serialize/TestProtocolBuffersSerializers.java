@@ -1,12 +1,11 @@
-package org.jsense.serialize.protobuf;
+package org.jsense.serialize;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteSink;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
-import org.jsense.serialize.Serializer;
-import org.jsense.serialize.protobuf.gen.ProtoModel;
+import org.jsense.serialize.gen.ProtoModel;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,7 +18,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
 /**
- * Tests for the {@link org.jsense.serialize.protobuf.AccelerometerEventSerializer}.
+ * Tests for the {@link org.jsense.serialize.PbAccelerometerEventSerializer}.
  *
  * @author Markus Wüstenberg
  */
@@ -39,7 +38,7 @@ public class TestProtocolBuffersSerializers {
     @Before
     public void setUp() {
         out = new ByteArrayOutputStream();
-        serializer = new AccelerometerEventSerializer(new ByteSink() {
+        serializer = new PbAccelerometerEventSerializer(new ByteSink() {
             @Override
             public OutputStream openStream() throws IOException {
                 return out;
@@ -95,7 +94,7 @@ public class TestProtocolBuffersSerializers {
 
     @Test(expected = NullPointerException.class)
     public void sinkCantBeNull() throws IOException {
-        new AccelerometerEventSerializer(null);
+        new PbAccelerometerEventSerializer(null);
     }
 
     @Test(expected = IllegalStateException.class)
