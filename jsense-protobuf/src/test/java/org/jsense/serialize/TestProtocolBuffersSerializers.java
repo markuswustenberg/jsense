@@ -2,7 +2,6 @@ package org.jsense.serialize;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
-import com.google.common.io.ByteSink;
 import org.jsense.AccelerometerEvent;
 import org.jsense.ModelFactory;
 import org.jsense.serialize.gen.ProtoModel;
@@ -12,7 +11,6 @@ import org.junit.Test;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -38,12 +36,7 @@ public class TestProtocolBuffersSerializers {
     @Before
     public void setUp() {
         out = new ByteArrayOutputStream();
-        serializer = new PbAccelerometerEventSerializer(new ByteSink() {
-            @Override
-            public OutputStream openStream() throws IOException {
-                return out;
-            }
-        });
+        serializer = new PbAccelerometerEventSerializer(out);
 
         ModelFactory.setSeed(SEED);
         event1 = ModelFactory.newRandomAccelerometerEvent();

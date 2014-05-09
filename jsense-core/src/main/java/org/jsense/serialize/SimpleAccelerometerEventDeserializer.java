@@ -1,18 +1,24 @@
 package org.jsense.serialize;
 
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
-import com.google.common.io.CharSource;
 import org.joda.time.Instant;
 import org.jsense.AccelerometerEvent;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.List;
 
 /**
  * A simple {@link org.jsense.serialize.Deserializer} that parses a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
+ * <p>
+ * Input charset is UTF-8.
+ * <p>
+ * Input is read with a {@link java.io.BufferedReader} for buffering.
  * <p>
  * Currently loads all events into memory.
  * <p>
@@ -32,24 +38,22 @@ public final class SimpleAccelerometerEventDeserializer implements Deserializer<
     private static final int Y_INDEX = 4;
     private static final int Z_INDEX = 5;
 
-    private static final String CLOSED_EXCEPTION_MESSAGE = "The Deserializer is closed, no deserializing possible.";
-
-    private final CharSource source;
+    private final InputStream source;
     private BufferedReader reader;
     private boolean closed;
 
-    public SimpleAccelerometerEventDeserializer(CharSource source) {
+    public SimpleAccelerometerEventDeserializer(InputStream source) {
         this.source = Preconditions.checkNotNull(source);
     }
 
     @Override
     public Iterable<AccelerometerEvent> deserialize() throws IOException {
         if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
+            throw new IOException(Constants.DESERIALIZER_CLOSED_EXCEPTION_MESSAGE);
         }
 
         if (reader == null) {
-            openSource();
+            reader = new BufferedReader(new InputStreamReader(source, Charsets.UTF_8));
         }
 
         String line;
@@ -73,13 +77,9 @@ public final class SimpleAccelerometerEventDeserializer implements Deserializer<
 
     @Override
     public void close() throws IOException {
-        closed = true;
         if (reader != null) {
             reader.close();
         }
-    }
-
-    private void openSource() throws IOException {
-        reader = source.openBufferedStream();
+        closed = true;
     }
 }

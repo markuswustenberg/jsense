@@ -1,8 +1,6 @@
 package org.jsense.serialize;
 
 import com.google.common.collect.ImmutableList;
-import com.google.common.io.ByteSink;
-import com.google.common.io.ByteSource;
 import org.joda.time.Instant;
 import org.joda.time.ReadableInstant;
 import org.jsense.AccelerometerEvent;
@@ -10,9 +8,9 @@ import org.jsense.ModelFactory;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Iterator;
 
 import static org.junit.Assert.*;
@@ -42,7 +40,7 @@ public class TestProtocolBuffersDeserializers {
 
     @Test
     public void deserializeSingleAccelerometerEvent() throws IOException {
-        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1))));
+        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(new ByteArrayInputStream(getByteArrayFrom(ImmutableList.of(event1))));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -52,7 +50,7 @@ public class TestProtocolBuffersDeserializers {
 
     @Test
     public void deserializeMultipleAccelerometerEvents() throws IOException {
-        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(ByteSource.wrap(getByteArrayFrom(ImmutableList.of(event1, event2))));
+        Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(new ByteArrayInputStream(getByteArrayFrom(ImmutableList.of(event1, event2))));
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
 
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -84,7 +82,7 @@ public class TestProtocolBuffersDeserializers {
                 .setZ(Z)
                 .build();
 
-        ByteSource serialized = ByteSource.wrap(getByteArrayFrom(ImmutableList.of(eventWithRelativeTimestamp, eventNoRelativeTimestamp)));
+        ByteArrayInputStream serialized = new ByteArrayInputStream(getByteArrayFrom(ImmutableList.of(eventWithRelativeTimestamp, eventNoRelativeTimestamp)));
         Deserializer<AccelerometerEvent> deserializer = new PbAccelerometerEventDeserializer(serialized);
         Iterable<AccelerometerEvent> events = deserializer.deserialize();
         Iterator<AccelerometerEvent> eventsIterator = events.iterator();
@@ -95,12 +93,7 @@ public class TestProtocolBuffersDeserializers {
 
     private byte[] getByteArrayFrom(Iterable<AccelerometerEvent> events) throws IOException {
         final ByteArrayOutputStream out = new ByteArrayOutputStream();
-        new PbAccelerometerEventSerializer(new ByteSink() {
-            @Override
-            public OutputStream openStream() throws IOException {
-                return out;
-            }
-        }).serialize(events).flush();
+        new PbAccelerometerEventSerializer(out).serialize(events).flush();
         return out.toByteArray();
     }
 }

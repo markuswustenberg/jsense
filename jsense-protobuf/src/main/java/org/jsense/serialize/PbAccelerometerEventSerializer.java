@@ -3,7 +3,6 @@ package org.jsense.serialize;
 import com.google.common.annotations.Beta;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.io.ByteSink;
 import org.jsense.AccelerometerEvent;
 import org.jsense.serialize.gen.ProtoModel;
 
@@ -21,15 +20,12 @@ import java.io.OutputStream;
 @Beta
 public final class PbAccelerometerEventSerializer implements Serializer<AccelerometerEvent> {
 
-    private static final String CLOSED_EXCEPTION_MESSAGE = "The Serializer is closed, no serializing possible.";
-
-    private final ByteSink sink;
-    private OutputStream out;
+    private final OutputStream sink;
     private boolean closed;
 
-    private ProtoModel.ThreeAxisSensorEvent.Builder builder = ProtoModel.ThreeAxisSensorEvent.newBuilder();
+    private final ProtoModel.ThreeAxisSensorEvent.Builder builder = ProtoModel.ThreeAxisSensorEvent.newBuilder();
 
-    public PbAccelerometerEventSerializer(ByteSink sink) {
+    public PbAccelerometerEventSerializer(OutputStream sink) {
         this.sink = Preconditions.checkNotNull(sink);
     }
 
@@ -37,13 +33,7 @@ public final class PbAccelerometerEventSerializer implements Serializer<Accelero
     public synchronized Serializer<AccelerometerEvent> serialize(AccelerometerEvent event) throws IOException {
         Preconditions.checkNotNull(event);
 
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
-
-        if (out == null) {
-            openSink();
-        }
+        checkClosed();
 
         writeEvent(event);
 
@@ -55,13 +45,7 @@ public final class PbAccelerometerEventSerializer implements Serializer<Accelero
         Preconditions.checkNotNull(events);
         Preconditions.checkState(!Iterables.isEmpty(events));
 
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
-
-        if (out == null) {
-            openSink();
-        }
+        checkClosed();
 
         for (AccelerometerEvent event : events) {
             writeEvent(event);
@@ -72,25 +56,15 @@ public final class PbAccelerometerEventSerializer implements Serializer<Accelero
 
     @Override
     public synchronized void flush() throws IOException {
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
+        checkClosed();
 
-        if (out != null) {
-            out.flush();
-        }
+        sink.flush();
     }
 
     @Override
     public synchronized void close() throws IOException {
-        if (!closed && out != null) {
-            out.close();
-        }
+        sink.close();
         closed = true;
-    }
-
-    private void openSink() throws IOException {
-        out = sink.openBufferedStream();
     }
 
     private void writeEvent(AccelerometerEvent event) throws IOException {
@@ -103,6 +77,12 @@ public final class PbAccelerometerEventSerializer implements Serializer<Accelero
         }
         ProtoModel.ThreeAxisSensorEvent proto = builder.build();
         builder.clear();
-        proto.writeDelimitedTo(out);
+        proto.writeDelimitedTo(sink);
+    }
+
+    private void checkClosed() throws IOException {
+        if (closed) {
+            throw new IOException(Constants.SERIALIZER_CLOSED_EXCEPTION_MESSAGE);
+        }
     }
 }

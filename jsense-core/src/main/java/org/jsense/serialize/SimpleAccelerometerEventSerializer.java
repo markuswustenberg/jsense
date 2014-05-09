@@ -1,18 +1,20 @@
 package org.jsense.serialize;
 
 import com.google.common.annotations.Beta;
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Iterables;
-import com.google.common.io.CharSink;
 import org.jsense.AccelerometerEvent;
 
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
 
 /**
  * A simple {@link org.jsense.serialize.Serializer} that creates a simple delimited representation of {@link org.jsense.AccelerometerEvent}s.
  * <p>
- * A newline character (\n) is always used between multiple events, so the line separator as defined by the system property <tt>line.separator</tt> is NOT used.
+ * Output charset is UTF-8. A newline character (\n) is always used between multiple events, so the line separator as defined by the system property <tt>line.separator</tt> is NOT
+ * used.
+ * <p>
+ * Output is written with a {@link java.io.BufferedWriter} for buffering.
  * <p>
  * This class is thread-safe.
  *
@@ -25,13 +27,11 @@ public final class SimpleAccelerometerEventSerializer implements Serializer<Acce
     private static final String STANDARD_DELIMITER = ",";
     private static final String LINE_SEPARATOR = "\n";
 
-    private static final String CLOSED_EXCEPTION_MESSAGE = "The Serializer is closed, no serializing possible.";
-
-    private final CharSink sink;
+    private final OutputStream sink;
     private Writer writer;
     private boolean closed;
 
-    public SimpleAccelerometerEventSerializer(CharSink sink) {
+    public SimpleAccelerometerEventSerializer(OutputStream sink) {
         this.sink = Preconditions.checkNotNull(sink);
     }
 
@@ -39,13 +39,8 @@ public final class SimpleAccelerometerEventSerializer implements Serializer<Acce
     public synchronized Serializer<AccelerometerEvent> serialize(AccelerometerEvent event) throws IOException {
         Preconditions.checkNotNull(event);
 
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
-
-        if (writer == null) {
-            openSink();
-        }
+        checkClosed();
+        checkAndOpenWriter();
 
         writeEvent(event);
 
@@ -57,13 +52,8 @@ public final class SimpleAccelerometerEventSerializer implements Serializer<Acce
         Preconditions.checkNotNull(events);
         Preconditions.checkState(!Iterables.isEmpty(events));
 
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
-
-        if (writer == null) {
-            openSink();
-        }
+        checkClosed();
+        checkAndOpenWriter();
 
         for (AccelerometerEvent event : events) {
             writeEvent(event);
@@ -74,25 +64,24 @@ public final class SimpleAccelerometerEventSerializer implements Serializer<Acce
 
     @Override
     public synchronized void flush() throws IOException {
-        if (closed) {
-            throw new IOException(CLOSED_EXCEPTION_MESSAGE);
-        }
+        checkClosed();
+        checkAndOpenWriter();
 
-        if (writer != null) {
-            writer.flush();
-        }
+        writer.flush();
     }
 
     @Override
     public synchronized void close() throws IOException {
-        if (!closed && writer != null) {
+        if (writer != null) {
             writer.close();
         }
         closed = true;
     }
 
-    private void openSink() throws IOException {
-        writer = sink.openBufferedStream();
+    private void checkAndOpenWriter() throws IOException {
+        if (writer == null) {
+            writer = new BufferedWriter(new OutputStreamWriter(sink, Charsets.UTF_8));
+        }
     }
 
     private void writeEvent(AccelerometerEvent event) throws IOException {
@@ -102,5 +91,11 @@ public final class SimpleAccelerometerEventSerializer implements Serializer<Acce
         writer.write(event.getX() + STANDARD_DELIMITER);
         writer.write(event.getY() + STANDARD_DELIMITER);
         writer.write(event.getZ() + LINE_SEPARATOR);
+    }
+
+    private void checkClosed() throws IOException {
+        if (closed) {
+            throw new IOException(Constants.SERIALIZER_CLOSED_EXCEPTION_MESSAGE);
+        }
     }
 }

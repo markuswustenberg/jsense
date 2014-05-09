@@ -1,4 +1,4 @@
-version '0.2.0'
+version '0.3.0-SNAPSHOT'
 description 'A Java library to work with sensing. Because sensing is nice. This is a supplemental library to allow serialization and deserialization to/from Google Protocol Buffers format.'
 
 apply plugin: 'protobuf'
