@@ -1,6 +1,7 @@
-apply plugin: 'protobuf'
+version '0.2.0'
+description 'A Java library to work with sensing. Because sensing is nice. This is a supplemental library to allow serialization and deserialization to/from Google Protocol Buffers format.'
 
-version '0.1.0-SNAPSHOT'
+apply plugin: 'protobuf'
 
 buildscript {
     repositories {
@@ -11,7 +12,7 @@ buildscript {
     }
 }
 
-def excludePattern = '/org/jsense/serialize/protobuf/gen/'
+def excludePattern = '/org/jsense/serialize/gen/'
 def excludePatternAntStyle = '**' + excludePattern + '*'
 tasks.withType(FindBugs) {
     classes = classes.filter {
